@@ -78,11 +78,11 @@ const LoginForm = () => {
         <p className="text-lg leading-[1.2] secondary-text">
           Access the vast collection of resources, and stay updated
         </p>
-        {errorMessage && (
+        {/* {errorMessage && (
           <p className="bg-red-50 text-red-500 px-4 py-3 rounded-lg text-sm mt-3">
             {errorMessage}
           </p>
-        )}
+        )} */}
       </div>
 
       <div className="w-full flex flex-col items-start gap-1 mt-1">
