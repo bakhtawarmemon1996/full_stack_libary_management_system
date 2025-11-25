@@ -10,6 +10,7 @@ import AddBookForm from "../components/Books/AddBookForm";
 import LoginPage from "../pages/auth/login/LoginPage";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
+import EditBookForm from "../components/Books/EditBookForm";
 
 const AppRoutes = () => {
   return (
@@ -77,6 +78,18 @@ const AppRoutes = () => {
             page={
               <PrivateRoute>
                 <BookDetails />
+              </PrivateRoute>
+            }
+          />
+        }
+      />
+      <Route
+        path="/books/edit/:bookId"
+        element={
+          <Layout
+            page={
+              <PrivateRoute>
+                <EditBookForm />
               </PrivateRoute>
             }
           />

@@ -27,7 +27,8 @@ exports.addBook = async (req, res) => {
 
 exports.getBooks = async (req, res) => {
   try {
-    const books = await bookService.getBooks();
+    const { search } = req.query;
+    const books = await bookService.getBooks({ search });
     res.status(200).json({ data: books });
   } catch (error) {
     console.error(error);

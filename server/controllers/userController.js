@@ -12,7 +12,15 @@ exports.getUserProfile = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
   try {
-    const users = await userService.getUsers();
+    const { search, page, limit, role } = req.query;
+
+    const users = await userService.getUsers({
+      search,
+      page,
+      limit,
+      role,
+    });
+
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -86,4 +94,3 @@ exports.approveUserProfile = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-

@@ -1,6 +1,7 @@
 import { IoCalendarOutline } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
 import { formatDate } from "../../utils/formatDate";
+import { Link } from "react-router-dom";
 
 const BookInfo = ({ book }) => {
   return (
@@ -27,12 +28,12 @@ const BookInfo = ({ book }) => {
         <h4 className="text-lg font-semibold">By {book?.author}</h4>
         <p className="secondary-text text-sm">{book?.genre}</p>
 
-        <button
-          type="button"
+        <Link
+          to={`/books/edit/${book?._id}`}
           className="primary-bg text-white py-2 text-sm flex items-center justify-center gap-2 font-bold rounded-lg w-full lg:w-[422px]"
         >
           <CiEdit className="text-xl" /> Edit Book
-        </button>
+        </Link>
       </div>
     </div>
   );

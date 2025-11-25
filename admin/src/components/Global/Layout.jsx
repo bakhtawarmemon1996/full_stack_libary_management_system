@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 import { IoSearchOutline } from "react-icons/io5";
 import { useGetProfileQuery } from "../../services/users/authApi";
 import Cookies from "js-cookie";
-import { data } from "react-router-dom";
+import { data, useSearchParams } from "react-router-dom";
 import Loader from "./Loader";
 import { setError, setLoading, setUser } from "../../features/slices/userSlice";
 import { useDispatch } from "react-redux";
@@ -16,6 +16,22 @@ const Layout = ({ page }) => {
   const toggleModal = () => {
     setisOpen(!isOpen);
   };
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchValue = searchParams.get("search") || "";
+  const [value, setValue] = useState(searchValue);
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      if (value.trim() === "") {
+        searchParams.delete("search");
+        setSearchParams(searchParams);
+      } else {
+        setSearchParams({ search: value });
+      }
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [value]);
 
   const token = Cookies.get("adminToken");
 
@@ -81,10 +97,12 @@ const Layout = ({ page }) => {
                 Monitor all of your projects and tasks here
               </p>
             </div>
-            <div className="flex gap-3 items-center justify-end h-12 rounded-xl bg-white w-[35%] px-3.5">
+            <div className="flex gap-2 items-center justify-end h-12 rounded-xl border bg-white w-[35%] px-3.5">
               <IoSearchOutline className="text-xl secondary-text" />
               <input
                 type="text"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
                 placeholder="Search users, books by title, author, or genre."
                 className="w-full h-full outline-none text-sm secondary-text"
               />

@@ -70,9 +70,35 @@ const createBook = async ({
   };
 };
 
-const getBooks = async () => {
-  const books = await Book.find();
-  return books;
+const getBooks = async ({ search, page, limit }) => {
+  const query = {};
+
+  if (search) {
+    query.$or = [
+      { bookTitle: { $regex: search, $options: "i" } },
+      { author: { $regex: search, $options: "i" } },
+      { genre: { $regex: search, $options: "i" } },
+      { bookSummary: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  // -------- PAGINATION --------
+  page = Number(page) || 1;
+  limit = Number(limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const total = await Book.countDocuments(query);
+
+  const books = await Book.find(query);
+  return {
+    books,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 const getBook = async (bookId) => {

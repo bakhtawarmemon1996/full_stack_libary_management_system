@@ -1,26 +1,41 @@
 import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { addBookFormValidationSchema } from "../../schemas/addBookFormValidationSchema";
 import InputField from "../Global/InputField";
 import SummaryField from "../Global/SummaryField";
 import ImageUpload from "../Global/ImageUpload";
 import BackButton from "../Global/BackButton";
-import { useAddBookMutation } from "../../services/books/books.service";
+import {
+  useAddBookMutation,
+  useGetBookByIdQuery,
+} from "../../services/books/books.service";
 import UploadedImageList from "./UploadedImageList";
 import { enqueueSnackbar } from "notistack";
+import { useEffect } from "react";
 
-const AddBookForm = () => {
+const EditBookForm = () => {
   const navigate = useNavigate();
+  const { bookId } = useParams();
+  const {
+    data,
+    error,
+    isLoading: bookIsPending,
+    refetch,
+  } = useGetBookByIdQuery(bookId, {
+    refetchOnFocus: false,
+  });
+
   const [addBook, { isLoading }] = useAddBookMutation();
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      title: "",
-      author: "",
-      grenre: "",
-      bookCount: "",
-      bookImages: [],
-      bookSummary: "",
+      title: data?.data?.bookTitle || "",
+      author: data?.data?.author || "",
+      grenre: data?.data?.genre || "",
+      bookCount: data?.data?.totalBooks || "",
+      bookImages: data?.data?.bookImages || [],
+      bookSummary: data?.data?.bookSummary || "",
     },
     validationSchema: addBookFormValidationSchema,
     onSubmit: async (values, { resetForm }) => {
@@ -45,13 +60,10 @@ const AddBookForm = () => {
         resetForm();
         enqueueSnackbar("Book added successfully!", { variant: "success" });
       } catch (error) {
-        // console.log("Add book error:", error);
-        enqueueSnackbar(
-          error?.data?.message ||
-            error?.message ||
-            error?.response?.data?.message,
-          { variant: "error" }
-        );
+        // enqueueSnackbar(
+        //   error?.data?.error || error?.error || error?.response?.data?.message,
+        //   { variant: "error" }
+        // );
       }
     },
   });
@@ -121,7 +133,7 @@ const AddBookForm = () => {
 
         {/* Uploaded Image Preview List */}
         <UploadedImageList
-          images={formik.values.bookImages}
+          images={formik?.values?.bookImages}
           onRemove={removeImage}
         />
 
@@ -146,4 +158,4 @@ const AddBookForm = () => {
   );
 };
 
-export default AddBookForm;
+export default EditBookForm;

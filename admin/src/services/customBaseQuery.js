@@ -1,4 +1,3 @@
-// services/customBaseQuery.js
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Cookies from "js-cookie";
 import { DEV_BASE_URL } from "../api/api";
@@ -21,7 +20,6 @@ export const customBaseQuery = async (args, api, extraOptions) => {
 
     switch (status) {
       case 401:
-        // Unauthorized → remove token & redirect to login
         enqueueSnackbar("Session expired. Please log in again.", {
           variant: "error",
         });
@@ -33,30 +31,50 @@ export const customBaseQuery = async (args, api, extraOptions) => {
         break;
 
       case 403:
-        enqueueSnackbar("You do not have permission.", {
-          variant: "error",
-        });
+        enqueueSnackbar(
+          result?.error?.message ||
+            result?.error?.data?.error ||
+            "You do not have permission.",
+          {
+            variant: "error",
+          }
+        );
         console.warn("Forbidden: You do not have permission.");
         break;
 
       case 404:
-        enqueueSnackbar("Oops! Resource not found!", {
-          variant: "error",
-        });
+        enqueueSnackbar(
+          result?.error?.message ||
+            result?.error?.data?.error ||
+            "Oops! Resource not found!",
+          {
+            variant: "error",
+          }
+        );
         console.warn("Resource not found.");
         break;
 
       case 500:
-        enqueueSnackbar("Something went wrong!", {
-          variant: "error",
-        });
+        enqueueSnackbar(
+          result?.error?.message ||
+            result?.error?.data?.error ||
+            "Something went wrong!",
+          {
+            variant: "error",
+          }
+        );
         console.error("Server error occurred.");
         break;
 
       default:
-        enqueueSnackbar(result?.data?.message || "Something went wrong!", {
-          variant: "error",
-        });
+        enqueueSnackbar(
+          result?.error?.message ||
+            result?.error?.data?.error ||
+            "Something went wrong!",
+          {
+            variant: "error",
+          }
+        );
         console.error("Unhandled API error:", result.error);
         break;
     }

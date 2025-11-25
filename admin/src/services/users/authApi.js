@@ -1,6 +1,4 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import Cookies from "js-cookie";
-import { DEV_BASE_URL } from "../../api/api";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { customBaseQuery } from "../customBaseQuery";
 
 export const authApi = createApi({
@@ -9,7 +7,7 @@ export const authApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (data) => ({
-        url: "/api/auth/login",
+        url: "/auth/login",
         method: "POST",
         body: data,
       }),
@@ -17,7 +15,19 @@ export const authApi = createApi({
     getProfile: builder.query({
       query: () => "/users/my-profile",
     }),
+    getUsers: builder.query({
+      query: ({ search, page, limit, skip }) => {
+        const params = new URLSearchParams();
+
+        if (search) params.append(`search`, search);
+
+        return {
+          url: `/users?${params.toString()}`,
+        };
+      },
+    }),
   }),
 });
 
-export const { useLoginMutation, useGetProfileQuery } = authApi;
+export const { useLoginMutation, useGetProfileQuery, useGetUsersQuery } =
+  authApi;

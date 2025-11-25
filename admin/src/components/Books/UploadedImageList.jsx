@@ -3,13 +3,13 @@ const UploadedImageList = ({ images, onRemove }) => {
 
   return (
     <div className="w-full flex items-center gap-5 flex-wrap mt-2">
-      {images.map((file, index) => {
-        const preview = URL.createObjectURL(file);
+      {images?.map((file, index) => {
+        // const preview = URL.createObjectURL(file);
 
         return (
           <div key={index} className="relative">
             <img
-              src={preview}
+              src={file}
               alt="uploaded"
               className="w-20 h-20 object-cover rounded-md border"
             />

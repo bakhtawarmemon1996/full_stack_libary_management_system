@@ -3,7 +3,7 @@ import * as Yup from "yup";
 export const addBookFormValidationSchema = Yup.object({
   title: Yup.string()
     .trim()
-    .matches(/^[a-zA-Z\s]+$/, "Title can only contain letters.")
+    // .matches(/^[a-zA-Z\s]+$/, "Title can only contain letters.")
     .min(3, "Title must contain at least 3 characters.")
     .max(50, "Title must be less than 50 characters.")
     .required("Title is required."),
@@ -28,6 +28,6 @@ export const addBookFormValidationSchema = Yup.object({
     .required("Book image is required."),
   bookSummary: Yup.string()
     .min(30, "Book summary must be at least 30 characters.")
-    .max(1000, "Book summary must be less than 1000 characters.")
+    .max(2000, "Book summary must be less than 2000 characters.")
     .required("Book summary is required."),
 });
