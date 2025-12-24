@@ -6,12 +6,11 @@ import SummaryField from "../Global/SummaryField";
 import ImageUpload from "../Global/ImageUpload";
 import BackButton from "../Global/BackButton";
 import {
-  useAddBookMutation,
+  useEditBookMutation,
   useGetBookByIdQuery,
 } from "../../services/books/books.service";
 import UploadedImageList from "./UploadedImageList";
 import { enqueueSnackbar } from "notistack";
-import { useEffect } from "react";
 
 const EditBookForm = () => {
   const navigate = useNavigate();
@@ -19,51 +18,57 @@ const EditBookForm = () => {
   const {
     data,
     error,
+    isError,
     isLoading: bookIsPending,
     refetch,
   } = useGetBookByIdQuery(bookId, {
     refetchOnFocus: false,
   });
 
-  const [addBook, { isLoading }] = useAddBookMutation();
+  const [editBook, { isLoading }] = useEditBookMutation();
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
       title: data?.data?.bookTitle || "",
       author: data?.data?.author || "",
-      grenre: data?.data?.genre || "",
+      genre: data?.data?.genre || "",
       bookCount: data?.data?.totalBooks || "",
       bookImages: data?.data?.bookImages || [],
       bookSummary: data?.data?.bookSummary || "",
     },
     validationSchema: addBookFormValidationSchema,
     onSubmit: async (values, { resetForm }) => {
-      console.log(values);
-
       try {
         const formData = new FormData();
 
         formData.append("bookTitle", values.title);
         formData.append("author", values.author);
-        formData.append("genre", values.grenre);
+        formData.append("genre", values.genre);
         formData.append("totalBooks", values.bookCount);
         formData.append("bookSummary", values.bookSummary);
 
-        values.bookImages.forEach((file) => {
-          formData.append("bookImages", file);
+        values.bookImages.forEach((img) => {
+          if (img instanceof File) {
+            formData.append("bookImages", img);
+          }
         });
 
-        const res = await addBook(formData).unwrap();
+        // keep existing images
+        const existingImages = values.bookImages.filter(
+          (img) => typeof img === "string"
+        );
+
+        // formData.append("bookImages", JSON.stringify(existingImages));
+
+        const res = await editBook({ data: formData, bookId }).unwrap();
         console.log("response >>> ", res);
 
         resetForm();
-        enqueueSnackbar("Book added successfully!", { variant: "success" });
+        enqueueSnackbar("Book updated successfully!", { variant: "success" });
+        navigate(`/books/${res?.data?._id}`);
       } catch (error) {
-        // enqueueSnackbar(
-        //   error?.data?.error || error?.error || error?.response?.data?.message,
-        //   { variant: "error" }
-        // );
+        console.log("err while editing book >>>> ", error);
       }
     },
   });
@@ -76,6 +81,14 @@ const EditBookForm = () => {
 
     formik.setFieldValue("bookImages", updatedImages);
   };
+
+  if (error || isError) {
+    return (
+      <div className="w-full h-screen bg-white rounded-xl screen flex justify-center items-center text-center pt-10">
+        <h2 className="secondary-text">{error?.data?.error}</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full pb-5">
@@ -110,9 +123,9 @@ const EditBookForm = () => {
             labelTitle="Genre"
             placeholder="Motivation"
             name="grenre"
-            value={formik.values.grenre}
+            value={formik.values.genre}
             onchange={formik.handleChange}
-            error={formik.touched.grenre && formik.errors.grenre}
+            error={formik.touched.genre && formik.errors.genre}
           />
 
           <InputField
@@ -127,7 +140,12 @@ const EditBookForm = () => {
 
         {/* Image Upload */}
         <ImageUpload
-          onChange={(files) => formik.setFieldValue("bookImages", files)}
+          onChange={(files) =>
+            formik.setFieldValue("bookImages", [
+              ...formik.values.bookImages,
+              ...files,
+            ])
+          }
           error={formik.touched.bookImages && formik.errors.bookImages}
         />
 

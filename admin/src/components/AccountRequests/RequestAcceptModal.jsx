@@ -1,7 +1,7 @@
 import React from "react";
 import { IoClose } from "react-icons/io5";
 
-const RequestAcceptModal = ({ isOpen, onclick, onclose }) => {
+const RequestAcceptModal = ({ isOpen, onclick, onclose, isLoading }) => {
   return (
     isOpen && (
       <div
@@ -26,7 +26,9 @@ const RequestAcceptModal = ({ isOpen, onclick, onclose }) => {
             />
           </div>
 
-          <h2 className="text-[20px] font-semibold leading-none mt-2">Deny Account Request</h2>
+          <h2 className="text-[20px] font-semibold leading-none mt-2">
+            Deny Account Request
+          </h2>
           <p className="secondary-text mb-2">
             Denying this request will notify the student they’re not eligible
             due to unsuccessful ID card verification.
@@ -35,9 +37,9 @@ const RequestAcceptModal = ({ isOpen, onclick, onclose }) => {
           <button
             type="button"
             onClick={() => onclick()}
-            className="bg-[#F46F70] text-white rounded-xl text-center w-full py-3 font-semibold"
+            className="bg-[#F46F70] text-white rounded-xl text-center w-full py-3 font-semibold outline-none"
           >
-            Deny & Notify Student
+            {isLoading ? "Loading..." : "Deny & Notify Student"}
           </button>
         </div>
       </div>

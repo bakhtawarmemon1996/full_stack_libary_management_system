@@ -6,7 +6,7 @@ import RecentlyAddedBookList from "../../components/Dashboard/RecentlyAddedBookL
 
 const Dashboard = () => {
   return (
-    <>
+    <React.Fragment>
       <Statistics />
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
         <div className="col-span-2 lg:col-span-1 flex flex-col items-start gap-5">
@@ -17,7 +17,7 @@ const Dashboard = () => {
           <RecentlyAddedBookList />
         </div>
       </div>
-    </>
+    </React.Fragment>
   );
 };
 

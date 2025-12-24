@@ -55,11 +55,11 @@ const LoginForm = () => {
           router("/");
         }
       } catch (error) {
+        console.log("login error >>> ", error);
         setErrorMessage(
-          error?.response?.data?.message ||
-            error?.data?.message ||
-            error?.message ||
-            "Something went wrong."
+          error?.data?.message ||
+            error?.response?.data?.message ||
+            error?.message
         );
       }
     },
@@ -86,7 +86,7 @@ const LoginForm = () => {
       </div>
 
       <div className="w-full flex flex-col items-start gap-1 mt-1">
-        <label htmlFor="email" className="secondary-text">
+        <label htmlFor="email" className="text-gray-800 font-medium">
           Email
         </label>
         <input
@@ -96,7 +96,7 @@ const LoginForm = () => {
           value={formik.values.email}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg outline-none block w-full p-3"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg outline-none block w-full px-5 h-[56px]"
           placeholder="adrian@jsmastery.pro"
         />
         {formik.touched.email && formik.errors.email ? (
@@ -104,10 +104,10 @@ const LoginForm = () => {
         ) : null}
       </div>
       <div className="w-full flex flex-col items-start gap-1">
-        <label htmlFor="password" className="secondary-text">
+        <label htmlFor="password" className="text-gray-800 font-medium">
           Password
         </label>
-        <div className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg outline-none w-full p-3 flex items-center justify-between">
+        <div className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg outline-none w-full px-5 h-[56px] flex items-center justify-between">
           <input
             type={showPass ? "text" : "password"}
             name="password"
@@ -115,7 +115,7 @@ const LoginForm = () => {
             value={formik.values.password}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className="secondary-text w-full outline-none bg-transparent"
+            className="secondary-text w-full outline-none bg-transparent text-gray-900"
             placeholder="Atleast 8 characters long"
           />
           <button type="button" onClick={() => togglePassword()}>
@@ -133,7 +133,6 @@ const LoginForm = () => {
 
       <div className="w-full mt-3">
         <Button text={"Login"} type={"submit"} loading={isLoading} />
-        {/* <button type="submit">Login</button> */}
       </div>
     </form>
   );

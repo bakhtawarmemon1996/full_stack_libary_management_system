@@ -9,9 +9,12 @@ import { useEffect } from "react";
 const BookDetails = () => {
   const navigate = useNavigate();
   const { bookId } = useParams();
-  const { data, error, isLoading, refetch } = useGetBookByIdQuery(bookId, {
-    refetchOnFocus: false,
-  });
+  const { data, error, isError, isLoading, refetch } = useGetBookByIdQuery(
+    bookId,
+    {
+      refetchOnFocus: false,
+    }
+  );
 
   useEffect(() => {
     refetch();
@@ -21,7 +24,7 @@ const BookDetails = () => {
 
   if (isLoading) return <Loader />;
 
-  if (error) {
+  if (error || isError) {
     return (
       <div className="w-full h-screen flex justify-center text-center pt-10">
         <h2>Something went wrong.</h2>

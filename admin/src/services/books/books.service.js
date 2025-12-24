@@ -25,14 +25,25 @@ export const booksAPi = createApi({
       }),
     }),
     editBook: builder.mutation({
-      query: (data) => ({
-        url: `/books/edit-book`,
+      query: ({ data, bookId }) => ({
+        url: `/books/${bookId}`,
         method: "PUT",
         body: data,
+      }),
+    }),
+    deleteBook: builder.mutation({
+      query: (id) => ({
+        url: `/books/${id}`,
+        method: "DELETE",
       }),
     }),
   }),
 });
 
-export const { useGetBooksQuery, useGetBookByIdQuery, useAddBookMutation } =
-  booksAPi;
+export const {
+  useGetBooksQuery,
+  useGetBookByIdQuery,
+  useAddBookMutation,
+  useEditBookMutation,
+  useDeleteBookMutation,
+} = booksAPi;

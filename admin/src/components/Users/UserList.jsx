@@ -1,26 +1,60 @@
-import { useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { GoTrash } from "react-icons/go";
-import { useGetUsersQuery } from "../../services/users/authApi";
+import {
+  useDeleteUserAccountMutation,
+  useGetUsersQuery,
+} from "../../services/users/authApi";
 import { formatDate } from "../../utils/formatDate";
 import PageLoader from "../Global/PageLoader";
-import Search from "../Global/Search";
 import ErrorPage from "../Global/ErrorPage";
+import UserCard from "./UserCard";
+import { enqueueSnackbar } from "notistack";
+import RequestLoader from "../Global/RequestLoader";
+import Pagination from "../Global/Pagination";
 
 const UserList = () => {
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get("search") || "";
-  const { data, error, isError, isLoading, refetch } = useGetUsersQuery({
-    search: searchTerm,
-  });
+  const [deleteUserAccount] = useDeleteUserAccountMutation();
+  const [deletingUser, setDeletingUser] = useState(false);
+  const page = Number(searchParams.get("page") || 1);
 
-  useEffect(() => {
-    refetch();
-  }, []);
+  const { data, isError, isLoading, refetch } = useGetUsersQuery(
+    {
+      search: searchTerm,
+      status: "accepted",
+      limit: 10,
+      page: 1,
+      page,
+    },
+    {
+      refetchOnFocus: true,
+    }
+  );
+  const [showUserCard, setShowUSerCard] = useState(false);
+  const [user, setUser] = useState(null);
 
   if (isLoading) return <PageLoader />;
 
   if (isError) return <ErrorPage />;
+
+  const deleteUser = async (userId) => {
+    if (!userId) return;
+    setDeletingUser(true);
+    try {
+      await deleteUserAccount({ userId }).unwrap();
+
+      enqueueSnackbar("User account deleted successfully.", {
+        variant: "success",
+      });
+      refetch();
+    } catch (error) {
+      console.log("err while deleting user account. ", error);
+    } finally {
+      setDeletingUser(false);
+    }
+  };
 
   return (
     <div className="w-full bg-white min-h-screen rounded-xl p-6">
@@ -29,9 +63,9 @@ const UserList = () => {
       </div>
 
       {data && data?.data?.length > 0 ? (
-        <div className="relative overflow-x-auto my-5">
+        <div className="relative overflow-x-auto my-5 min-h-screen">
           <table className="w-full text-sm text-left rtl:text-righ">
-            <thead className="text-xs text-[#3A354E] bg-[#F8F8FF]">
+            <thead className="text-sm whitespace-nowrap text-[#3A354E] bg-[#F8F8FF]">
               <tr>
                 <th scope="col" className="px-6 py-4">
                   Name
@@ -80,19 +114,33 @@ const UserList = () => {
                         </span>
                       </div>
                     </th>
-                    <td className="px-6 py-4">{formatDate(user?.createdAt)}</td>
+                    <td className="px-6 py-4">
+                      <span className="whitespace-nowrap">
+                        {formatDate(user?.createdAt)}
+                      </span>
+                    </td>
                     <td className="px-6 py-4">
                       {user?.role.charAt(0).toUpperCase() + user?.role.slice(1)}
                     </td>
                     <td className="px-6 py-4">{user?.booksBorrowedCount}</td>
                     <td className="px-6 py-4">{user?.idNumber}</td>
                     <td className="px-6 py-4">
-                      <Link to={`/`} className="text-blue-500 font-medium">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowUSerCard((prev) => !prev);
+                          setUser(user);
+                        }}
+                        className="text-blue-500 font-medium whitespace-nowrap"
+                      >
                         View Card
-                      </Link>
+                      </button>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <button type="button">
+                      <button
+                        type="button"
+                        onClick={() => deleteUser(user?._id)}
+                      >
                         <GoTrash className="text-base text-red-500" />
                       </button>
                     </td>
@@ -108,6 +156,14 @@ const UserList = () => {
           </div>
         </div>
       )}
+
+      <Pagination />
+
+      {showUserCard && (
+        <UserCard setShowUSerCard={setShowUSerCard} user={user} />
+      )}
+
+      {deletingUser && <RequestLoader />}
     </div>
   );
 };

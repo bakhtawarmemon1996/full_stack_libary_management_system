@@ -1,7 +1,7 @@
 import React from "react";
 import { IoClose } from "react-icons/io5";
 
-const RequestRejectModal = ({ isOpen, onclick, onclose }) => {
+const RequestRejectModal = ({ isOpen, onclick, onclose, isLoading }) => {
   return (
     isOpen && (
       <div
@@ -39,7 +39,7 @@ const RequestRejectModal = ({ isOpen, onclick, onclose }) => {
             onClick={() => onclick()}
             className="bg-[#4C7B62] text-white rounded-xl text-center w-full py-3 font-semibold"
           >
-            Approve & Send Confirmation
+            {isLoading ? "Loading..." : "Approve & Send Confirmation"}
           </button>
         </div>
       </div>

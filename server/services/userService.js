@@ -7,7 +7,7 @@ const getProfile = async (userId) => {
 };
 
 // userService.js
-const getUsers = async ({ search, page, limit, role }) => {
+const getUsers = async ({ search, page, limit, role, status }) => {
   const query = {};
 
   // -------- ROLE FILTER --------
@@ -15,6 +15,11 @@ const getUsers = async ({ search, page, limit, role }) => {
     query.role = { $in: role.split(",") }; // supports multiple roles
   } else {
     query.role = { $in: ["student", "manager"] };
+  }
+
+  // -------- STATUS FILTER --------
+  if (status) {
+    query.status = status; // pending | accepted | rejected
   }
 
   // -------- SEARCH FILTER --------
@@ -60,10 +65,10 @@ const updateUserRole = async (userId, role) => {
   return user;
 };
 
-const approveUserProfile = async (userId, isApproved) => {
+const approveUserProfile = async (userId, status) => {
   const user = await User.findByIdAndUpdate(
     userId,
-    { isApproved },
+    { status },
     { new: true }
   ).select("-password");
   return user;

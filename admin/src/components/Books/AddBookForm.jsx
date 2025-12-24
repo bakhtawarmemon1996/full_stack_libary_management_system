@@ -17,42 +17,37 @@ const AddBookForm = () => {
     initialValues: {
       title: "",
       author: "",
-      grenre: "",
+      genre: "",
       bookCount: "",
+      bookCoverImage: "",
       bookImages: [],
       bookSummary: "",
     },
     validationSchema: addBookFormValidationSchema,
     onSubmit: async (values, { resetForm }) => {
-      console.log(values);
-
       try {
         const formData = new FormData();
 
         formData.append("bookTitle", values.title);
         formData.append("author", values.author);
-        formData.append("genre", values.grenre);
+        formData.append("genre", values.genre);
         formData.append("totalBooks", values.bookCount);
         formData.append("bookSummary", values.bookSummary);
+        formData.append("bookCoverImage", values.bookCoverImage[0]);
 
         values.bookImages.forEach((file) => {
           formData.append("bookImages", file);
         });
 
         const res = await addBook(formData).unwrap();
-        console.log("response >>> ", res);
+        // console.log("response >>> ", res);
 
         resetForm();
         enqueueSnackbar("Book added successfully!", { variant: "success" });
-      } catch (error) {
-        // console.log("Add book error:", error);
-        enqueueSnackbar(
-          error?.data?.message ||
-            error?.message ||
-            error?.response?.data?.message,
-          { variant: "error" }
-        );
-      }
+        if (res?.data?._id) {
+          navigate(`/books/${res?.data?._id}`);
+        }
+      } catch (error) {}
     },
   });
 
@@ -97,10 +92,10 @@ const AddBookForm = () => {
           <InputField
             labelTitle="Genre"
             placeholder="Motivation"
-            name="grenre"
-            value={formik.values.grenre}
+            name="genre"
+            value={formik.values.genre}
             onchange={formik.handleChange}
-            error={formik.touched.grenre && formik.errors.grenre}
+            error={formik.touched.genre && formik.errors.genre}
           />
 
           <InputField
@@ -113,17 +108,37 @@ const AddBookForm = () => {
           />
         </div>
 
-        {/* Image Upload */}
-        <ImageUpload
-          onChange={(files) => formik.setFieldValue("bookImages", files)}
-          error={formik.touched.bookImages && formik.errors.bookImages}
-        />
+        <div className="w-full">
+          {/* cover image */}
+          <ImageUpload
+            label="Book Cover Image"
+            multiple={false}
+            onChange={(files) => formik.setFieldValue("bookCoverImage", files)}
+            error={
+              formik.touched.bookCoverImage && formik.errors.bookCoverImage
+            }
+          />
+          {/* Uploaded Cover Image Preview */}
+          <UploadedImageList
+            images={formik.values.bookCoverImage}
+            onRemove={removeImage}
+          />
+        </div>
 
-        {/* Uploaded Image Preview List */}
-        <UploadedImageList
-          images={formik.values.bookImages}
-          onRemove={removeImage}
-        />
+        <div className="w-full">
+          {/* Image Upload */}
+          <ImageUpload
+            label="Book Image (Optional)"
+            onChange={(files) => formik.setFieldValue("bookImages", files)}
+            error={formik.touched.bookImages && formik.errors.bookImages}
+          />
+
+          {/* Uploaded Image Preview List */}
+          <UploadedImageList
+            images={formik.values.bookImages}
+            onRemove={removeImage}
+          />
+        </div>
 
         <SummaryField
           labelTitle="Book Summary"

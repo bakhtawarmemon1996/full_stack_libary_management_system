@@ -7,7 +7,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { useSignupMutation } from "@/services/authApi";
 import Cookies from "js-cookie";
 
@@ -57,6 +56,8 @@ const RegistrationForm = () => {
       email: "",
       idNumber: "",
       password: "",
+      phoneNumber: "",
+      dateOfBirth: "",
     },
     validate,
     onSubmit: async (values, { resetForm }) => {
@@ -66,9 +67,10 @@ const RegistrationForm = () => {
           email: values.email,
           password: values.password,
           idNumber: values.idNumber,
+          phoneNumber: values.phoneNumber,
+          dateOfBirth: values.dateOfBirth,
           role: "student",
         }).unwrap();
-        console.log("signup response >>> ", response);
         alert("Account created successfully!");
         Cookies.set("token", response?.token);
         Cookies.set("token", JSON.stringify(response?.data));
@@ -105,6 +107,7 @@ const RegistrationForm = () => {
         access to the library
       </p>
 
+      {/* Name */}
       <div className="w-full flex flex-col items-start gap-1 mt-3">
         <label htmlFor="name" className="secondary-text">
           Full name
@@ -123,6 +126,7 @@ const RegistrationForm = () => {
           <p className="text-red-600 text-sm">{formik.errors.name}</p>
         ) : null}
       </div>
+      {/* Email */}
       <div className="w-full flex flex-col items-start gap-1">
         <label htmlFor="email" className="secondary-text">
           Email
@@ -141,6 +145,7 @@ const RegistrationForm = () => {
           <p className="text-red-600 text-sm">{formik.errors.email}</p>
         ) : null}
       </div>
+      {/* ID number */}
       <div className="w-full flex flex-col items-start gap-1">
         <label htmlFor="idNumber" className="secondary-text">
           University ID Number
@@ -159,6 +164,45 @@ const RegistrationForm = () => {
           <p className="text-red-600 text-sm">{formik.errors.idNumber}</p>
         ) : null}
       </div>
+      {/* Date of birth */}
+      <div className="w-full flex flex-col items-start gap-1">
+        <label htmlFor="dateOfBirth" className="secondary-text">
+          Date Of Birth
+        </label>
+        <input
+          type="date"
+          name="dateOfBirth"
+          id="dateOfBirth"
+          value={formik.values.dateOfBirth}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
+          placeholder="eg: 394365762"
+        />
+        {formik.touched.idNumber && formik.errors.idNumber ? (
+          <p className="text-red-600 text-sm">{formik.errors.idNumber}</p>
+        ) : null}
+      </div>
+      {/* phone number */}
+      <div className="w-full flex flex-col items-start gap-1">
+        <label htmlFor="phoneNumber" className="secondary-text">
+          Contact No.
+        </label>
+        <input
+          type="date"
+          name="phoneNumber"
+          id="phoneNumber"
+          value={formik.values.phoneNumber}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
+          placeholder="eg: 394365762"
+        />
+        {formik.touched.idNumber && formik.errors.idNumber ? (
+          <p className="text-red-600 text-sm">{formik.errors.idNumber}</p>
+        ) : null}
+      </div>
+      {/* Password */}
       <div className="w-full flex flex-col items-start gap-1">
         <label htmlFor="password" className="secondary-text">
           Password

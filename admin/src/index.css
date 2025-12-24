@@ -4,6 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primary-bg: #25388c;
+  --secondary-bg: #606165;
+}
+
 * {
   padding: 0;
   margin: 0;
@@ -32,5 +37,5 @@ body {
 }
 
 .button {
-  @apply text-white primary-bg focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-4 text-center disabled:cursor-not-allowed;
+  @apply text-white primary-bg focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 h-[56px] flex items-center justify-center text-center disabled:cursor-not-allowed;
 }

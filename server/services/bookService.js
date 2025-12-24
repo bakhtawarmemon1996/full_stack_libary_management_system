@@ -13,25 +13,23 @@ const createBook = async ({
   bookPrimaryColor,
 }) => {
   const existingBook = await Book.findOne({ bookTitle });
-  const existinGenre = await Book.findOne({ genre });
-  const booksCount = await Book.find();
 
   if (existingBook)
     throw new Error(`Book already exists with title ${bookTitle}`);
-  if (genre?.length < 8) {
-    throw new Error("Genre must contain 8 digits");
-  } else if (existinGenre) {
-    throw new Error(`Book already exists with genre ${existinGenre}`);
+
+  // Upload COVER IMAGE (single file)
+  if (!bookCoverImage) {
+    throw new Error("Book cover image is required");
   }
 
-  // const uploadCoverImage = await cloudinary.uploader.upload(
-  //   `data:${bookCoverImage.mimetype};base64,${bookCoverImage.buffer.toString(
-  //     "base64"
-  //   )}`,
-  //   {
-  //     folder: "book_cover_images",
-  //   }
-  // );
+  const uploadCoverImage = await cloudinary.uploader.upload(
+    `data:${bookCoverImage.mimetype};base64,${bookCoverImage.buffer.toString(
+      "base64"
+    )}`,
+    {
+      folder: "book_cover_images",
+    }
+  );
 
   const uploadBookImages = await Promise.all(
     bookImages.map(async (img) => {
@@ -45,13 +43,24 @@ const createBook = async ({
     })
   );
 
+  const booksCount = await Book.countDocuments();
+  let generateBookId = booksCount + 1;
+
+  let formattedBookId;
+
+  if (generateBookId < 10) {
+    formattedBookId = String(generateBookId).padStart(4, "0");
+  } else {
+    formattedBookId = String(generateBookId).padStart(3, "0");
+  }
+
   const book = await Book.create({
-    id: booksCount.length,
+    id: formattedBookId,
     bookTitle,
     author,
     genre,
     totalBooks,
-    // bookCoverImage: uploadCoverImage.secure_url,
+    bookCoverImage: uploadCoverImage.secure_url,
     bookImages: uploadBookImages,
     bookSummary,
     bookPrimaryColor,
@@ -61,11 +70,12 @@ const createBook = async ({
     message: "Book added successfully",
     data: {
       id: book.id,
+      _id: book._id,
       bookTitle: book.bookTitle,
       author: book.author,
       genre: book.genre,
       totalBooks: book.totalBooks,
-      // bookCoverImage: book.bookCoverImage,
+      bookCoverImage: book.bookCoverImage,
       bookImages: book.bookImages,
       bookSummary: book.bookSummary,
       bookPrimaryColor: book.bookPrimaryColor,
@@ -92,7 +102,11 @@ const getBooks = async ({ search, page, limit }) => {
 
   const total = await Book.countDocuments(query);
 
-  const books = await Book.find(query);
+  const books = await Book.find(query)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
   return {
     books,
     pagination: {
@@ -109,98 +123,51 @@ const getBook = async (bookId) => {
   return book;
 };
 
-const editBook = async (
-  bookId,
-  {
+const editBook = async (bookId, payload) => {
+  const book = await Book.findById(bookId);
+  if (!book) throw new Error("Book not found");
+
+  const {
     bookTitle,
     author,
     genre,
     totalBooks,
-    bookCoverImage,
-    bookImages,
     bookSummary,
     bookPrimaryColor,
-  }
-) => {
-  const book = await Book.findById(bookId);
-  if (!book) {
-    return res.status(404).json({ message: "Book no found" });
-  }
+    bookImages = [],
+    existingImages = [],
+  } = payload;
 
-  if (bookTitle) {
-    const existingBook = await Book.findOne({
-      bookTitle,
-      _id: { $ne: book._id },
-    });
-    if (existingBook) {
-      throw new Error(`Another book exists with title "${bookTitle}"`);
-    }
-    book.bookTitle = bookTitle;
-  }
-
-  if (genre && genre !== book?.genre) {
-    if (genre.length !== 8) {
-      throw new Error("Genre must contain 8 digits");
-    }
-
-    const existingGenre = await Book.findOne({ genre, _id: { $ne: book._id } });
-    if (existingGenre) {
-      throw new Error(`Another book already exists with this genre ${genre}`);
-    }
-
-    book.genre = genre;
-  }
-
+  if (bookTitle) book.bookTitle = bookTitle;
   if (author) book.author = author;
-  if (totalBooks) book.totalBooks = totalBooks;
+  if (genre) book.genre = genre;
+  if (totalBooks !== undefined) book.totalBooks = totalBooks;
   if (bookSummary) book.bookSummary = bookSummary;
   if (bookPrimaryColor) book.bookPrimaryColor = bookPrimaryColor;
-  if (!bookCoverImage) {
-    throw new Error("Book cover image is required");
-  }
-  if (bookCoverImage) {
-    const uploadedCover = await cloudinary.uploader.upload(
-      `data:${bookCoverImage.mimetype};base64,${bookCoverImage.buffer.toString(
-        "base64"
-      )}`,
-      {
-        folder: "book_cover_images",
-      }
-    );
 
-    book.bookCoverImage = uploadedCover.secure_url;
-  }
-
-  if (bookImages && bookImages.length > 0) {
-    const uploadedImages = await Promise.all(
-      bookImages?.map(async (img) => {
+  let uploadedImages = [];
+  if (bookImages.length > 0) {
+    uploadedImages = await Promise.all(
+      bookImages.map(async (img) => {
         const res = await cloudinary.uploader.upload(
           `data:${img.mimetype};base64,${img.buffer.toString("base64")}`,
-          {
-            folder: "book_images",
-          }
+          { folder: "book_images" }
         );
+
+        return res.secure_url;
       })
     );
+  }
 
-    book.bookImages = uploadedImages;
+  if (uploadedImages.length > 0 || existingImages.length > 0) {
+    book.bookImages = [...existingImages, ...uploadedImages];
   }
 
   await book.save();
 
   return {
-    message: "Book updated successfull",
-    data: {
-      id: book?.id,
-      bookTitle: book.bookTitle,
-      author: book.author,
-      genre: book.genre,
-      totalBooks: book.totalBooks,
-      bookCoverImage: book.bookCoverImage,
-      bookImages: book.bookImages,
-      bookSummary: book.bookSummary,
-      bookPrimaryColor: book.bookPrimaryColor,
-    },
+    message: "Book updated successfully",
+    data: book,
   };
 };
 

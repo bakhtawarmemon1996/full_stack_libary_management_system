@@ -8,7 +8,7 @@ const InputField = ({
 }) => {
   return (
     <div className="w-full">
-      <label className="block mb-2 text-sm font-medium text-gray-900">
+      <label className="block mb-2 text-base font-medium text-gray-900">
         {labelTitle}
       </label>
 
@@ -20,7 +20,7 @@ const InputField = ({
         placeholder={placeholder}
         className={`bg-white border ${
           error ? "border-red-500" : "border-gray-300"
-        } text-gray-900 text-sm rounded-lg outline-none block w-full p-3`}
+        } text-gray-900 text-base rounded-lg outline-none block w-full px-5 h-[56px]`}
       />
 
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}

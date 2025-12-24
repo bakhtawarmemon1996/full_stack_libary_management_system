@@ -8,6 +8,9 @@ const register = async ({
   idNumber,
   role = "student",
   isApproved = true,
+  phoneNumber,
+  dateOfBirth,
+  department,
 }) => {
   const existingUser = await User.findOne({ email });
   if (existingUser)
@@ -20,13 +23,13 @@ const register = async ({
       idNumber = null;
     }
 
-    isApproved = true;
+    isApproved = "accepted";
   } else if (role === "student") {
     if (!idNumber) throw new Error("ID is required.");
     if (idNumber?.length !== 13) {
       throw new Error("ID must contain 13 digits.");
     }
-    isApproved = false;
+    isApproved = "pending";
 
     const existingId = await User.findOne({ idNumber });
     if (existingId) throw new Error("ID is already registered!");
@@ -38,7 +41,10 @@ const register = async ({
     password,
     idNumber,
     role,
-    isAccountApproved: isApproved,
+    status: isApproved,
+    phoneNumber,
+    dateOfBirth,
+    department,
   });
 
   return {
@@ -51,7 +57,10 @@ const register = async ({
       email: user.email,
       role: user.role,
       idNumber: user.idNumber,
-      isAccountApproved: user.isAccountApproved,
+      status: user.status,
+      phoneNumber,
+      dateOfBirth,
+      department,
     },
     token: generateToken(user._id),
   };
@@ -72,7 +81,7 @@ const login = async ({ email, password }) => {
       email: user.email,
       idNumber: user.idNumber,
       role: user.role,
-      isAccountApproved: user.isAccountApproved,
+      status: user.status,
       booksBorrowedCount: user.booksBorrowedCount,
     },
     token: generateToken(user._id),

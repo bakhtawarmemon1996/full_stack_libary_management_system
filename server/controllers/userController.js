@@ -12,19 +12,36 @@ exports.getUserProfile = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
   try {
-    const { search, page, limit, role } = req.query;
+    const { search, page, limit, role, status } = req.query;
 
     const users = await userService.getUsers({
       search,
       page,
       limit,
       role,
+      status,
     });
 
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+exports.getUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required." });
+    }
+
+    const user = await Users.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.status(200).json({ message: "User fetched successfully", user });
+  } catch (error) {}
 };
 
 exports.updateUserRole = async (req, res) => {
@@ -57,12 +74,13 @@ exports.deleteUser = async (req, res) => {
   try {
     const userId = req.params.userId;
     if (!userId) {
-      throw new Error("User id is required");
+      // throw new Error("User id is required");
+      return res.status(400).json({ message: "User ID is required." });
     }
 
     const user = await Users.findById(userId);
     if (!user) {
-      throw new Error("User not found");
+      return res.status(400).json({ message: "User not found." });
     }
     await Users.findByIdAndDelete(userId);
     res.status(200).json({ message: "User deleted successfully" });
@@ -76,19 +94,21 @@ exports.approveUserProfile = async (req, res) => {
   try {
     const userId = req.params.userId;
     if (!userId) {
-      throw new Error("User id is required");
+      return res.status(400).json({ message: "User id is required" });
     }
-    const { isApproved } = req.body;
+    const { status } = req.body;
 
-    if (!isApproved) {
-      throw new Error("User profile status is required");
+    if (!status) {
+      return res
+        .status(400)
+        .json({ message: "User profile status is required" });
     }
-    const updatedUser = await userService.approveUserProfile(
-      userId,
-      isApproved
-    );
+    const updatedUser = await userService.approveUserProfile(userId, status);
 
-    res.status(200).json({ message: "Account approved", data: updatedUser });
+    res.status(200).json({
+      message: `Account ${status} successfully.`,
+      data: updatedUser,
+    });
   } catch (error) {
     console.error("err while approving profile >>>>", error);
     res.status(500).json({ message: "Server error", error: error.message });

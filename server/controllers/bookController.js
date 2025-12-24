@@ -2,6 +2,7 @@ const bookService = require("../services/bookService");
 const Books = require("../models/Book");
 const BorrowRequests = require("../models/borrowRequests");
 
+// add new book
 exports.addBook = async (req, res) => {
   try {
     const bookImages = req.files?.bookImages || [];
@@ -9,10 +10,10 @@ exports.addBook = async (req, res) => {
     if (existingBook) {
       throw new Error(`Book with title ${req.body.bookTitle} already exists.`);
     }
-    const existingGenre = await Books.findOne({ genre: req.body.genre });
-    if (existingGenre) {
-      throw new Error(`Book with genre ${req.body.genre} already exists.`);
-    }
+    // const existingGenre = await Books.findOne({ genre: req.body.genre });
+    // if (existingGenre) {
+    //   throw new Error(`Book with genre ${req.body.genre} already exists.`);
+    // }
 
     const data = await bookService.createBook({
       ...req.body,
@@ -25,6 +26,7 @@ exports.addBook = async (req, res) => {
   }
 };
 
+// get all books
 exports.getBooks = async (req, res) => {
   try {
     const { search } = req.query;
@@ -36,6 +38,7 @@ exports.getBooks = async (req, res) => {
   }
 };
 
+// get book by id
 exports.getBook = async (req, res) => {
   try {
     if (!req.params.bookId) {
@@ -53,17 +56,23 @@ exports.getBook = async (req, res) => {
   }
 };
 
+// edit a book
 exports.editBook = async (req, res) => {
   try {
     const bookId = req.params.bookId;
-    if (!bookId) throw new Error("Book id is required");
+    if (!bookId) {
+      return res.status(400).json({ message: "Book ID is required." });
+    }
 
-    const bookCoverImage = req.files.bookCoverImage?.[0];
+    const book = await Books.findById(bookId);
+    if (!book) {
+      return res.status(404).json({ message: "Book not found." });
+    }
+
     const bookImages = req.files?.bookImages || [];
 
     const updatedBook = await bookService.editBook(bookId, {
       ...req.body,
-      bookCoverImage,
       bookImages,
     });
 
@@ -74,11 +83,12 @@ exports.editBook = async (req, res) => {
   }
 };
 
+// delete a book by id
 exports.deleteBook = async (req, res) => {
   try {
     const bookId = req.params.bookId;
     if (!bookId) {
-      throw new Error("Book ID is required");
+      return res.status(400).json({ message: "Book ID is required." });
     }
     await Books.findByIdAndDelete(bookId);
     res.status(200).json({ message: "Book deleted successfully" });
@@ -88,6 +98,7 @@ exports.deleteBook = async (req, res) => {
   }
 };
 
+// request to borrow a book
 exports.requestBorrowBook = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -116,6 +127,7 @@ exports.requestBorrowBook = async (req, res) => {
   }
 };
 
+// accept or reject borrow request submitted by a student
 exports.acceptRejectRequestBorrowBook = async (req, res) => {
   try {
     const requestId = req.params.requestId;

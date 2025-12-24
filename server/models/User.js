@@ -4,6 +4,24 @@ const bcrypt = require("bcryptjs");
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    phoneNumber: {
+      type: String,
+      required: function () {
+        return this.role === "student";
+      },
+    },
+    dateOfBirth: {
+      type: String,
+      required: function () {
+        return this.role === "student";
+      },
+    },
+    department: {
+      type: String,
+      required: function () {
+        return this.role === "student";
+      },
+    },
     email: {
       type: String,
       required: true,
@@ -24,7 +42,11 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "student", "manager"],
       default: "student",
     },
-    isAccountApproved: { type: Boolean, default: false },
+    status: {
+      type: String,
+      default: "pending",
+      enum: ["pending", "accepted", "rejected", "deleted"],
+    },
     booksBorrowedCount: { type: Number, default: 0 },
     booksBorrowed: [
       {

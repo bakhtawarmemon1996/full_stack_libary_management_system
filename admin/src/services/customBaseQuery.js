@@ -30,9 +30,21 @@ export const customBaseQuery = async (args, api, extraOptions) => {
         }
         break;
 
+      case 400:
+        enqueueSnackbar(
+          result?.error?.data?.error ||
+            result?.error?.data?.message ||
+            "Something went wrong.",
+          {
+            variant: "error",
+          }
+        );
+        console.warn("fwefew");
+        break;
+
       case 403:
         enqueueSnackbar(
-          result?.error?.message ||
+          result?.error?.data?.message ||
             result?.error?.data?.error ||
             "You do not have permission.",
           {
@@ -68,7 +80,8 @@ export const customBaseQuery = async (args, api, extraOptions) => {
 
       default:
         enqueueSnackbar(
-          result?.error?.message ||
+          result?.error?.data?.message ||
+            result?.error?.message ||
             result?.error?.data?.error ||
             "Something went wrong!",
           {

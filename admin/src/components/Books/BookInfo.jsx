@@ -16,21 +16,21 @@ const BookInfo = ({ book }) => {
 
       <div className="flex flex-col items-start justify-between gap-6 w-full">
         <div className="w-full flex items-center gap-2">
-          <p className="secondary-text text-sm">Created at:</p>
-          <div className="flex items-center gap-2">
-            <IoCalendarOutline className="secondary-text text-base" />
-            <span className="secondary-text text-base">
+          <p className="secondary-text text-sm lg:text-lg">Created at:</p>
+          <div className="flex items-center gap-1">
+            <IoCalendarOutline className="secondary-text text-base lg:text-xl" />
+            <span className="secondary-text text-base lg:text-lg">
               {formatDate(book?.createdAt, { month: "long" })}
             </span>
           </div>
         </div>
         <h3 className="text-[24px] font-semibold">{book?.bookTitle}</h3>
         <h4 className="text-lg font-semibold">By {book?.author}</h4>
-        <p className="secondary-text text-sm">{book?.genre}</p>
+        <p className="secondary-text text-sm lg:text-base">{book?.genre}</p>
 
         <Link
           to={`/books/edit/${book?._id}`}
-          className="primary-bg text-white py-2 text-sm flex items-center justify-center gap-2 font-bold rounded-lg w-full lg:w-[422px]"
+          className="primary-bg text-white py-2 text-sm flex items-center justify-center gap-2 font-bold rounded-lg w-full lg:w-[422px] h-[44px]"
         >
           <CiEdit className="text-xl" /> Edit Book
         </Link>
