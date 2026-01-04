@@ -8,6 +8,7 @@ import BackButton from "../Global/BackButton";
 import { useAddBookMutation } from "../../services/books/books.service";
 import UploadedImageList from "./UploadedImageList";
 import { enqueueSnackbar } from "notistack";
+import Button from "../Global/Button";
 
 const AddBookForm = () => {
   const navigate = useNavigate();
@@ -149,13 +150,7 @@ const AddBookForm = () => {
           error={formik.touched.bookSummary && formik.errors.bookSummary}
         />
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="button disabled:opacity-50"
-        >
-          {isLoading ? "Adding..." : "Add"}
-        </button>
+        <Button text={`Add`} type={"submit"} loading={isLoading} />
       </form>
     </div>
   );

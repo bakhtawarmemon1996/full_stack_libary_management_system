@@ -9,42 +9,12 @@ import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import { useSignupMutation } from "@/services/authApi";
 import Cookies from "js-cookie";
-
-const validate = (values) => {
-  const errors = {};
-
-  if (!values.name) {
-    errors.name = "Name is required";
-  } else if (values.name.length < 3) {
-    errors.name = "Name can not be less than 3 characters";
-  }
-
-  if (!values.email) {
-    errors.email = "Email is required";
-  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-    errors.email = "Invalid email address";
-  }
-
-  if (!values.idNumber) {
-    errors.idNumber = "ID number is required";
-  } else if (values.idNumber.length !== 13) {
-    errors.idNumber = "ID number must contain 13 digits";
-  }
-
-  if (!values.password) {
-    errors.password = "Password is required";
-  } else if (values.password.length < 8) {
-    errors.password = "Password cannot be less than 8 characters";
-  }
-
-  return errors;
-};
+import { signupValidationSchema } from "@/validtationSchema/signupValidationSchema";
 
 const RegistrationForm = () => {
   const [showPass, setShowPass] = useState(false);
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [signup, { isLoading, error }] = useSignupMutation();
+  const [signup, { isLoading }] = useSignupMutation();
 
   const togglePassword = () => {
     setShowPass((prev) => !prev);
@@ -56,10 +26,11 @@ const RegistrationForm = () => {
       email: "",
       idNumber: "",
       password: "",
-      phoneNumber: "",
       dateOfBirth: "",
+      department: "",
+      phoneNumber: "",
     },
-    validate,
+    validationSchema: signupValidationSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
         const response = await signup({
@@ -69,6 +40,7 @@ const RegistrationForm = () => {
           idNumber: values.idNumber,
           phoneNumber: values.phoneNumber,
           dateOfBirth: values.dateOfBirth,
+          department: values.department,
           role: "student",
         }).unwrap();
         alert("Account created successfully!");
@@ -90,7 +62,7 @@ const RegistrationForm = () => {
   return (
     <form
       onSubmit={formik.handleSubmit}
-      className="w-full flex flex-col items-start justify-center gap-6 md:w-[80%]"
+      className="w-full flex flex-col items-start justify-center gap-6 md:w-[80%] max-w-[600px]"
     >
       <Image
         src={"/logo.png"}
@@ -120,7 +92,7 @@ const RegistrationForm = () => {
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
-          placeholder="adrian@jsmastery.pro"
+          placeholder="Ethan Smith"
         />
         {formik.touched.name && formik.errors.name ? (
           <p className="text-red-600 text-sm">{formik.errors.name}</p>
@@ -129,7 +101,7 @@ const RegistrationForm = () => {
       {/* Email */}
       <div className="w-full flex flex-col items-start gap-1">
         <label htmlFor="email" className="secondary-text">
-          Email
+          Email address
         </label>
         <input
           type="email"
@@ -139,7 +111,7 @@ const RegistrationForm = () => {
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
-          placeholder="adrian@jsmastery.pro"
+          placeholder="ethansmith@gmail.com"
         />
         {formik.touched.email && formik.errors.email ? (
           <p className="text-red-600 text-sm">{formik.errors.email}</p>
@@ -151,7 +123,7 @@ const RegistrationForm = () => {
           University ID Number
         </label>
         <input
-          type="text"
+          type="number"
           name="idNumber"
           id="idNumber"
           value={formik.values.idNumber}
@@ -179,8 +151,8 @@ const RegistrationForm = () => {
           className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
           placeholder="eg: 394365762"
         />
-        {formik.touched.idNumber && formik.errors.idNumber ? (
-          <p className="text-red-600 text-sm">{formik.errors.idNumber}</p>
+        {formik.touched.dateOfBirth && formik.errors.dateOfBirth ? (
+          <p className="text-red-600 text-sm">{formik.errors.dateOfBirth}</p>
         ) : null}
       </div>
       {/* phone number */}
@@ -189,7 +161,7 @@ const RegistrationForm = () => {
           Contact No.
         </label>
         <input
-          type="date"
+          type="number"
           name="phoneNumber"
           id="phoneNumber"
           value={formik.values.phoneNumber}
@@ -198,8 +170,27 @@ const RegistrationForm = () => {
           className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
           placeholder="eg: 394365762"
         />
-        {formik.touched.idNumber && formik.errors.idNumber ? (
-          <p className="text-red-600 text-sm">{formik.errors.idNumber}</p>
+        {formik.touched.phoneNumber && formik.errors.phoneNumber ? (
+          <p className="text-red-600 text-sm">{formik.errors.phoneNumber}</p>
+        ) : null}
+      </div>
+      {/* Department */}
+      <div className="w-full flex flex-col items-start gap-1">
+        <label htmlFor="department" className="secondary-text">
+          Department
+        </label>
+        <input
+          type="text"
+          name="department"
+          id="department"
+          value={formik.values.department}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
+          placeholder="e.g: Computer Science"
+        />
+        {formik.touched.department && formik.errors.department ? (
+          <p className="text-red-600 text-sm">{formik.errors.department}</p>
         ) : null}
       </div>
       {/* Password */}
@@ -232,7 +223,7 @@ const RegistrationForm = () => {
       </div>
 
       <div className="w-full mt-2">
-        <Button text={"Register"} type={"submit"} loading={loading} />
+        <Button text={"Register"} type={"submit"} loading={isLoading} />
       </div>
 
       <p className="secondary-text font-medium text-center mt-2 mx-auto">

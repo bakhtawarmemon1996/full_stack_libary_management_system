@@ -2,35 +2,41 @@ const bookService = require("../services/bookService");
 const Books = require("../models/Book");
 const BorrowRequests = require("../models/borrowRequests");
 
-// add new book
 exports.addBook = async (req, res) => {
   try {
     const bookImages = req.files?.bookImages || [];
-    const existingBook = await Books.findOne({ bookTitle: req.body.bookTitle });
+    const bookCoverImage = req.files?.bookCoverImage?.[0]; // ✅ FIX
+
+    if (!bookCoverImage) {
+      throw new Error("Book cover image is required");
+    }
+
+    const existingBook = await Books.findOne({
+      bookTitle: req.body.bookTitle,
+    });
+
     if (existingBook) {
       throw new Error(`Book with title ${req.body.bookTitle} already exists.`);
     }
-    // const existingGenre = await Books.findOne({ genre: req.body.genre });
-    // if (existingGenre) {
-    //   throw new Error(`Book with genre ${req.body.genre} already exists.`);
-    // }
 
     const data = await bookService.createBook({
       ...req.body,
       bookImages,
+      bookCoverImage,
     });
+
     res.status(201).json(data);
   } catch (error) {
     console.error("Error in addBook:", error);
-    res.status(400).json({ message: "Server error", error: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
 // get all books
 exports.getBooks = async (req, res) => {
   try {
-    const { search } = req.query;
-    const books = await bookService.getBooks({ search });
+    const { search, department } = req.query;
+    const books = await bookService.getBooks({ search, department });
     res.status(200).json({ data: books });
   } catch (error) {
     console.error(error);
@@ -56,30 +62,27 @@ exports.getBook = async (req, res) => {
   }
 };
 
-// edit a book
 exports.editBook = async (req, res) => {
   try {
-    const bookId = req.params.bookId;
-    if (!bookId) {
-      return res.status(400).json({ message: "Book ID is required." });
-    }
+    const { bookId } = req.params;
 
-    const book = await Books.findById(bookId);
-    if (!book) {
-      return res.status(404).json({ message: "Book not found." });
+    if (!bookId) {
+      return res.status(400).json({ message: "Book ID is required" });
     }
 
     const bookImages = req.files?.bookImages || [];
+    const bookCoverImage = req.files?.bookCoverImage?.[0] || null;
 
     const updatedBook = await bookService.editBook(bookId, {
       ...req.body,
       bookImages,
+      bookCoverImage,
     });
 
     res.status(200).json(updatedBook);
   } catch (error) {
-    console.error("Err while updating book: ", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Err while updating book:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 

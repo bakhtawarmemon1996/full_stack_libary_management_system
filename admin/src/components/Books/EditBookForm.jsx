@@ -3,14 +3,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { addBookFormValidationSchema } from "../../schemas/addBookFormValidationSchema";
 import InputField from "../Global/InputField";
 import SummaryField from "../Global/SummaryField";
-import ImageUpload from "../Global/ImageUpload";
 import BackButton from "../Global/BackButton";
+import { enqueueSnackbar } from "notistack";
+import Button from "../Global/Button";
+import { IoClose } from "react-icons/io5";
 import {
   useEditBookMutation,
   useGetBookByIdQuery,
 } from "../../services/books/books.service";
-import UploadedImageList from "./UploadedImageList";
-import { enqueueSnackbar } from "notistack";
+import PageLoader from "../Global/PageLoader";
 
 const EditBookForm = () => {
   const navigate = useNavigate();
@@ -36,6 +37,9 @@ const EditBookForm = () => {
       bookCount: data?.data?.totalBooks || "",
       bookImages: data?.data?.bookImages || [],
       bookSummary: data?.data?.bookSummary || "",
+      bookCoverImage: data?.data?.bookCoverImage
+        ? [data.data.bookCoverImage]
+        : [],
     },
     validationSchema: addBookFormValidationSchema,
     onSubmit: async (values, { resetForm }) => {
@@ -48,18 +52,13 @@ const EditBookForm = () => {
         formData.append("totalBooks", values.bookCount);
         formData.append("bookSummary", values.bookSummary);
 
+        formData.append("bookCoverImage", values.bookCoverImage[0]);
+
         values.bookImages.forEach((img) => {
           if (img instanceof File) {
             formData.append("bookImages", img);
           }
         });
-
-        // keep existing images
-        const existingImages = values.bookImages.filter(
-          (img) => typeof img === "string"
-        );
-
-        // formData.append("bookImages", JSON.stringify(existingImages));
 
         const res = await editBook({ data: formData, bookId }).unwrap();
         console.log("response >>> ", res);
@@ -73,14 +72,49 @@ const EditBookForm = () => {
     },
   });
 
-  const handleNavigateBack = () => navigate(-1);
+  // Handle cover image change
+  const handleCoverImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const removeImage = (index) => {
+    formik.setFieldValue("bookCoverImage", [file]);
+  };
+
+  // Handle multiple book images upload
+  const handleBookImagesChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    const existingImagesCount = formik.values.bookImages.length;
+    const remainingSlots = 5 - existingImagesCount;
+
+    if (remainingSlots <= 0) {
+      enqueueSnackbar("You can upload maximum 5 images", {
+        variant: "warning",
+      });
+      return;
+    }
+
+    const filesToAdd = files.slice(0, remainingSlots);
+
+    formik.setFieldValue("bookImages", [
+      ...formik.values.bookImages,
+      ...filesToAdd,
+    ]);
+  };
+
+  // Remove book image (existing or new)
+  const handleRemoveBookImage = (index) => {
     const updatedImages = [...formik.values.bookImages];
     updatedImages.splice(index, 1);
 
     formik.setFieldValue("bookImages", updatedImages);
   };
+
+  const handleNavigateBack = () => navigate(-1);
+
+  if (bookIsPending) {
+    return <PageLoader />;
+  }
 
   if (error || isError) {
     return (
@@ -122,7 +156,7 @@ const EditBookForm = () => {
           <InputField
             labelTitle="Genre"
             placeholder="Motivation"
-            name="grenre"
+            name="genre"
             value={formik.values.genre}
             onchange={formik.handleChange}
             error={formik.touched.genre && formik.errors.genre}
@@ -138,22 +172,78 @@ const EditBookForm = () => {
           />
         </div>
 
-        {/* Image Upload */}
-        <ImageUpload
-          onChange={(files) =>
-            formik.setFieldValue("bookImages", [
-              ...formik.values.bookImages,
-              ...files,
-            ])
-          }
-          error={formik.touched.bookImages && formik.errors.bookImages}
-        />
+        <div className="w-full">
+          <label className="block mb-2 text-sm font-medium text-gray-900">
+            Cover Image
+          </label>
 
-        {/* Uploaded Image Preview List */}
-        <UploadedImageList
-          images={formik?.values?.bookImages}
-          onRemove={removeImage}
-        />
+          <label className="flex flex-col items-center justify-center w-full h-[56px] bg-white border rounded-lg cursor-pointer border-gray-300">
+            <p className="text-sm secondary-text">
+              <strong className="font-medium">Click to upload new cover</strong>
+            </p>
+
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleCoverImageChange}
+            />
+          </label>
+
+          {formik.values.bookCoverImage?.length > 0 && (
+            <img
+              src={
+                formik.values.bookCoverImage[0] instanceof File
+                  ? URL.createObjectURL(formik.values.bookCoverImage[0])
+                  : formik.values.bookCoverImage[0]
+              }
+              alt="Book cover"
+              className="object-cover h-[86px] rounded mt-3"
+            />
+          )}
+        </div>
+
+        <div className="w-full">
+          <label className="block mb-2 text-sm font-medium text-gray-900">
+            Book Images (max 5)
+          </label>
+
+          <label className="flex flex-col items-center justify-center w-full h-[56px] bg-white border rounded-lg cursor-pointer border-gray-300">
+            <p className="text-sm secondary-text">
+              <strong className="font-medium">Click to upload</strong>
+            </p>
+
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleBookImagesChange}
+            />
+          </label>
+
+          {formik.values.bookImages.length > 0 && (
+            <div className="w-full flex gap-4 mt-3 flex-wrap">
+              {formik.values.bookImages.map((img, index) => (
+                <div className="relative" key={index}>
+                  <img
+                    src={img instanceof File ? URL.createObjectURL(img) : img}
+                    alt={`Book image ${index + 1}`}
+                    className="object-cover h-[86px] rounded"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveBookImage(index)}
+                    className="w-5 h-5 bg-gray-300 rounded-full absolute -top-2 -right-2 z-10 flex items-center justify-center"
+                  >
+                    <IoClose className="text-gray-700" size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         <SummaryField
           labelTitle="Book Summary"
@@ -164,13 +254,7 @@ const EditBookForm = () => {
           error={formik.touched.bookSummary && formik.errors.bookSummary}
         />
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="button disabled:opacity-50"
-        >
-          {isLoading ? "Adding..." : "Add"}
-        </button>
+        <Button text={`Save`} type={"submit"} loading={isLoading} />
       </form>
     </div>
   );

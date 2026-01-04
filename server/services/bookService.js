@@ -83,7 +83,7 @@ const createBook = async ({
   };
 };
 
-const getBooks = async ({ search, page, limit }) => {
+const getBooks = async ({ search, page, limit, department }) => {
   const query = {};
 
   if (search) {
@@ -93,6 +93,9 @@ const getBooks = async ({ search, page, limit }) => {
       { genre: { $regex: search, $options: "i" } },
       { bookSummary: { $regex: search, $options: "i" } },
     ];
+  }
+  if (department) {
+    query.genre = department;
   }
 
   // -------- PAGINATION --------
@@ -135,9 +138,10 @@ const editBook = async (bookId, payload) => {
     bookSummary,
     bookPrimaryColor,
     bookImages = [],
-    existingImages = [],
+    bookCoverImage,
   } = payload;
 
+  // Update text fields
   if (bookTitle) book.bookTitle = bookTitle;
   if (author) book.author = author;
   if (genre) book.genre = genre;
@@ -145,22 +149,31 @@ const editBook = async (bookId, payload) => {
   if (bookSummary) book.bookSummary = bookSummary;
   if (bookPrimaryColor) book.bookPrimaryColor = bookPrimaryColor;
 
-  let uploadedImages = [];
+  // Replace COVER image if provided
+  if (bookCoverImage) {
+    const coverUpload = await cloudinary.uploader.upload(
+      `data:${bookCoverImage.mimetype};base64,${bookCoverImage.buffer.toString(
+        "base64"
+      )}`,
+      { folder: "book_cover_images" }
+    );
+
+    book.bookCoverImage = coverUpload.secure_url;
+  }
+
+  // Replace BOOK IMAGES if new ones are uploaded
   if (bookImages.length > 0) {
-    uploadedImages = await Promise.all(
+    const uploadedImages = await Promise.all(
       bookImages.map(async (img) => {
         const res = await cloudinary.uploader.upload(
           `data:${img.mimetype};base64,${img.buffer.toString("base64")}`,
           { folder: "book_images" }
         );
-
         return res.secure_url;
       })
     );
-  }
 
-  if (uploadedImages.length > 0 || existingImages.length > 0) {
-    book.bookImages = [...existingImages, ...uploadedImages];
+    book.bookImages = [...book.bookImages, ...uploadedImages];
   }
 
   await book.save();

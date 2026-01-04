@@ -20,6 +20,7 @@ const BooksList = () => {
     { search: searchTerm },
     {
       refetchOnFocus: true,
+      refetchOnMountOrArgChange: true,
     }
   );
   const [deleteBook, { isLoading: isDeleting }] = useDeleteBookMutation();
@@ -89,9 +90,9 @@ const BooksList = () => {
                         className="px-6 py-4 font-medium whitespace-nowrap flex items-center gap-2 max-w-[300px] cursor-pointer"
                       >
                         <img
-                          src={book?.bookImages[0]}
+                          src={book?.bookCoverImage}
                           alt="book01"
-                          className="max-w-[29px] object-contain"
+                          className="max-w-[29px] object-contain rounded"
                         />
                         <span className="text-wrap">{book?.bookTitle}</span>
                       </td>

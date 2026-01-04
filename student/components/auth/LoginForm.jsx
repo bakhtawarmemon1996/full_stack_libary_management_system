@@ -49,7 +49,7 @@ const LoginForm = () => {
   return (
     <form
       onSubmit={formik.handleSubmit}
-      className="w-full lg:w-[80%] flex flex-col items-start justify-center gap-6 py-20"
+      className="w-full lg:w-[80%] max-w-[600px] flex flex-col items-start justify-center gap-6 py-20"
     >
       <Image
         src={"/logo.png"}

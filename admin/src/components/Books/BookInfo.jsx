@@ -6,15 +6,15 @@ import { Link } from "react-router-dom";
 const BookInfo = ({ book }) => {
   return (
     <div className="w-full mt-5 flex items-start gap-5 bg-white p-5 rounded-xl">
-      <div className="w-[250px] h-[250px] rounded-xl bg-gray-50 flex items-center justify-center">
+      <div className="w-[240px] h-[230px] rounded-xl bg-gray-50 flex items-center justify-center">
         <img
-          src={book?.bookImages[0]}
+          src={book?.bookCoverImage}
           alt="book"
           className="w-[125px] h-[174px] object-cover rounded-lg"
         />
       </div>
 
-      <div className="flex flex-col items-start justify-between gap-6 w-full">
+      <div className="flex flex-col items-start justify-between gap-4 w-full">
         <div className="w-full flex items-center gap-2">
           <p className="secondary-text text-sm lg:text-lg">Created at:</p>
           <div className="flex items-center gap-1">

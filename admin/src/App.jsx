@@ -1,4 +1,3 @@
-import "./App.css";
 import AppRoutes from "./routes/AppRoutes";
 import { SnackbarProvider } from "notistack";
 
