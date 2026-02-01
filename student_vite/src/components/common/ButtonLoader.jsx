@@ -1,5 +1,4 @@
-import React from "react";
-import "./ButtonLoader.css"
+import "./ButtonLoader.css";
 
 const ButtonLoader = () => {
   return (

@@ -20,7 +20,9 @@ export const authApi = createApi({
       }),
     }),
     getProfile: builder.query({
-      url: "/my-profile",
+      query: () => ({
+        url: "/users/my-profile",
+      }),
     }),
   }),
 });

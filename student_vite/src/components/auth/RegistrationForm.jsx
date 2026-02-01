@@ -1,18 +1,32 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaRegEye } from "react-icons/fa6";
 import { FaRegEyeSlash } from "react-icons/fa6";
 import Button from "../common/Button";
-import Link from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import { useNavigation } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useSignupMutation } from "../../services/authApi";
 import { signupValidationSchema } from "../../validationSchema/registrationSchema";
+import { FiChevronDown } from "react-icons/fi";
+import { DEPARTMENTS } from "../../constants/departments";
 
 const RegistrationForm = () => {
   const [showPass, setShowPass] = useState(false);
-  const router = useNavigation();
+  const router = useNavigate();
   const [signup, { isLoading }] = useSignupMutation();
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const togglePassword = () => {
     setShowPass((prev) => !prev);
@@ -48,14 +62,19 @@ const RegistrationForm = () => {
         router("/");
       } catch (error) {
         console.log("Err while creating an account >>>>", error);
-        alert(
-          error?.response?.data?.message ||
-            error?.message ||
-            "Something went wrong!"
-        );
+        // alert(
+        //     error?.data?.message ||
+        //   error?.response?.data?.message ||
+        //     "Something went wrong!"
+        // );
       }
     },
   });
+
+  const handleSelect = (value) => {
+    formik.setFieldValue("department", value);
+    setOpen(false);
+  };
 
   return (
     <form
@@ -167,23 +186,43 @@ const RegistrationForm = () => {
         ) : null}
       </div>
       {/* Department */}
-      <div className="w-full flex flex-col items-start gap-1">
-        <label htmlFor="department" className="secondary-text">
-          Department
-        </label>
-        <input
-          type="text"
-          name="department"
-          id="department"
-          value={formik.values.department}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
-          placeholder="e.g: Computer Science"
-        />
-        {formik.touched.department && formik.errors.department ? (
+      <div className="w-full flex flex-col gap-1 relative" ref={dropdownRef}>
+        <label className="secondary-text">Department</label>
+
+        {/* Input / Trigger */}
+        <button
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          className="bg-[#232839] p-3 secondary-text w-full rounded-md flex items-center justify-between outline-none"
+        >
+          <span>{formik.values.department || "Select a department"}</span>
+          <FiChevronDown
+            className={`transition-transform ${open ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {/* Dropdown */}
+        {open && (
+          <div className="absolute top-full mt-1 w-full bg-[#232839] rounded-md shadow-lg max-h-[200px] overflow-y-auto z-50">
+            {DEPARTMENTS?.map((dept) => (
+              <button
+                key={dept}
+                type="button"
+                onClick={() => handleSelect(dept)}
+                className={`w-full text-left px-4 py-2 secondary-text hover:bg-[#2f3550] transition-colors ${
+                  formik.values.department === dept ? "bg-[#2f3550]" : ""
+                }`}
+              >
+                {dept}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Error */}
+        {formik.touched.department && formik.errors.department && (
           <p className="text-red-600 text-sm">{formik.errors.department}</p>
-        ) : null}
+        )}
       </div>
       {/* Password */}
       <div className="w-full flex flex-col items-start gap-1">

@@ -19,9 +19,9 @@ const SearchResultList = () => {
       department: searchDepartment,
     },
     {
-      refetchOnFocus: true,
-      refetchOnMountOrArgChange: true,
-    }
+      // refetchOnFocus: true,
+      // refetchOnMountOrArgChange: true,
+    },
   );
 
   const books = data?.data?.books;
@@ -30,9 +30,13 @@ const SearchResultList = () => {
   return (
     <section className="w-full relative padding-x py-10">
       <div className="w-full flex items-center justify-between gap-5 flex-wrap">
-        <h2 className="secondary-text font-semibold text-[32px]">
-          Search Results
-        </h2>
+        {searchQuery ? (
+          <h2 className="secondary-text font-semibold text-[32px]">
+            Search Results
+          </h2>
+        ) : (
+          <div></div>
+        )}
 
         <DepartmentFilter />
       </div>
@@ -44,9 +48,17 @@ const SearchResultList = () => {
           })}
         </div>
       ) : (
-        <div className="w-full text-center pt-20">
-          <p className="secondary-text">No books found!</p>
-        </div>
+        <main className="w-full min-h-[60vh] pt-10 flex flex-col items-center justify-start gap-4 px-4">
+          <img
+            src="/no-books-placeholder.png"
+            alt="no-books-placeholder"
+            width={150}
+            height={150}
+          />
+          <p className="text-[24px] font-semibold">
+            We couldn't find any books!
+          </p>
+        </main>
       )}
 
       {books?.length > 11 && <Pagination />}

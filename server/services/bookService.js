@@ -24,11 +24,11 @@ const createBook = async ({
 
   const uploadCoverImage = await cloudinary.uploader.upload(
     `data:${bookCoverImage.mimetype};base64,${bookCoverImage.buffer.toString(
-      "base64"
+      "base64",
     )}`,
     {
       folder: "book_cover_images",
-    }
+    },
   );
 
   const uploadBookImages = await Promise.all(
@@ -37,10 +37,10 @@ const createBook = async ({
         `data:${img.mimetype};base64,${img.buffer.toString("base64")}`,
         {
           folder: "book_images",
-        }
+        },
       );
       return res.secure_url;
-    })
+    }),
   );
 
   const booksCount = await Book.countDocuments();
@@ -60,6 +60,7 @@ const createBook = async ({
     author,
     genre,
     totalBooks,
+    availableBooks: totalBooks,
     bookCoverImage: uploadCoverImage.secure_url,
     bookImages: uploadBookImages,
     bookSummary,
@@ -153,9 +154,9 @@ const editBook = async (bookId, payload) => {
   if (bookCoverImage) {
     const coverUpload = await cloudinary.uploader.upload(
       `data:${bookCoverImage.mimetype};base64,${bookCoverImage.buffer.toString(
-        "base64"
+        "base64",
       )}`,
-      { folder: "book_cover_images" }
+      { folder: "book_cover_images" },
     );
 
     book.bookCoverImage = coverUpload.secure_url;
@@ -167,10 +168,10 @@ const editBook = async (bookId, payload) => {
       bookImages.map(async (img) => {
         const res = await cloudinary.uploader.upload(
           `data:${img.mimetype};base64,${img.buffer.toString("base64")}`,
-          { folder: "book_images" }
+          { folder: "book_images" },
         );
         return res.secure_url;
-      })
+      }),
     );
 
     book.bookImages = [...book.bookImages, ...uploadedImages];
@@ -184,26 +185,26 @@ const editBook = async (bookId, payload) => {
   };
 };
 
-const requestBorrowBook = async (userId, bookId, dueDate) => {
+const requestBorrowBook = async (userId, bookId) => {
   try {
     const existingRequest = await BorrowRequests.findOne({
       user: userId,
       book: bookId,
-      status: { $in: ["Pending", "Borrowed"] },
+      status: { $in: ["pending", "borrowed"] },
     });
 
     if (existingRequest) {
       throw new Error(
-        `You already have a pending or borrowed request for this book.`
+        `You already have a pending or borrowed request for this book.`,
       );
     }
 
     const borrowRequest = await BorrowRequests.create({
       user: userId,
       book: bookId,
-      status: "Pending",
+      status: "pending",
       borrowedDate: null,
-      dueDate: dueDate,
+      // dueDate: dueDate,
       returnDate: null,
     });
 
@@ -250,7 +251,7 @@ const updateRequestStatus = async (requestId, status) => {
   const updatedRequest = await BorrowRequests.findByIdAndUpdate(
     requestId,
     { status },
-    { new: true }
+    { new: true },
   );
 
   return updatedRequest;

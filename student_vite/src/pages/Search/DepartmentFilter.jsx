@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 const DepartmentFilter = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [department, setDepartment] = useState(
-    searchParams.get("department") || ""
+    searchParams.get("department") || "",
   );
 
   useEffect(() => {
@@ -20,8 +20,8 @@ const DepartmentFilter = () => {
   }, [department, setSearchParams]);
 
   return (
-    <div className="w-[212px] h-[38px] bg-[#232839] rounded-[10px] flex items-center justify-center gap-1">
-      <label htmlFor="department" className="text-gray-400">
+    <div className="w-[212px] h-[38px] bg-[#232839] rounded-[10px] flex items-center justify-center gap-1 px-4">
+      <label htmlFor="department" className="text-gray-400 whitespace-nowrap">
         Filter by:
       </label>
 
@@ -29,7 +29,7 @@ const DepartmentFilter = () => {
         id="department"
         value={department}
         onChange={(e) => setDepartment(e.target.value)}
-        className="outline-none bg-[#232839] text-white"
+        className="outline-none bg-[#232839] text-white w-full"
       >
         <option value="">Genre</option>
         <option value="fiction">Fiction</option>

@@ -106,18 +106,18 @@ exports.requestBorrowBook = async (req, res) => {
   try {
     const userId = req.user._id;
     const bookId = req.params.bookId;
-    const { dueDate } = req.body;
+    // const { dueDate } = req.body;
     if (!userId) {
       throw new Error("User ID is required");
     }
     if (!bookId) {
       throw new Error("Book ID is required");
     }
-    if (!dueDate) {
-      throw new Error("Due date is required");
-    }
+    // if (!dueDate) {
+    //   throw new Error("Due date is required");
+    // }
 
-    const result = await bookService.requestBorrowBook(userId, bookId, dueDate);
+    const result = await bookService.requestBorrowBook(userId, bookId);
 
     res.status(201).json({
       message: "Request submitted successfully",
@@ -148,7 +148,7 @@ exports.acceptRejectRequestBorrowBook = async (req, res) => {
     }
     const updatedRequest = await bookService.updateRequestStatus(
       requestId,
-      status
+      status,
     );
 
     return res

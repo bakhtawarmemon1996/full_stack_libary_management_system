@@ -26,8 +26,9 @@ const register = async ({
     isApproved = "accepted";
   } else if (role === "student") {
     if (!idNumber) throw new Error("ID is required.");
-    if (idNumber?.length !== 13) {
-      throw new Error("ID must contain 13 digits.");
+    idNumber = String(idNumber);
+    if (!/^\d{13}$/.test(idNumber)) {
+      throw new Error("ID must contain exactly 13 digits.");
     }
     isApproved = "pending";
 

@@ -16,18 +16,31 @@ const HomePage = () => {
     {
       refetchOnFocus: true,
       refetchOnMountOrArgChange: true,
-    }
+    },
   );
 
   const books = data?.data?.books;
-  const book = data?.data?.books[0];
   const pagination = data?.data?.pagination;
 
   if (isLoading) return <PageLoader />;
 
+  if (books.length <= 0) {
+    return (
+      <main className="w-full min-h-screen flex flex-col items-center justify-center gap-4 px-4">
+        <img
+          src="/no-books-placeholder.png"
+          alt="no-books-placeholder"
+          width={150}
+          height={150}
+        />
+        <p className="text-[24px] font-semibold">We couldn't find any books!</p>
+      </main>
+    );
+  }
+
   return (
     <React.Fragment>
-      <Header book={book} />
+      <Header books={books} />
       {books?.length > 0 && <Listing books={books} />}
     </React.Fragment>
   );

@@ -7,6 +7,7 @@ import LoginForm from "../components/auth/LoginForm";
 import HomePage from "../pages/Home/HomePage";
 import SearchPage from "../pages/Search/SearchPage";
 import ProfilePage from "../pages/Profile/ProfilePage";
+import RegistrationForm from "../components/auth/RegistrationForm";
 
 const AppRoutes = () => {
   return (
@@ -29,7 +30,7 @@ const AppRoutes = () => {
         element={
           <PublicRoutes>
             <AuthLayout>
-              <LoginForm />
+              <RegistrationForm />
             </AuthLayout>
           </PublicRoutes>
         }

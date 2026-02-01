@@ -13,13 +13,22 @@ export const bookApi = createApi({
         params: {
           page,
           limit,
-          department,
+          ...(department && { department }),
           ...(search && { search }),
         },
       }),
       providesTags: ["Books"],
     }),
+
+    // request borrow book
+    requestBook: builder.mutation({
+      query: ({ bookId }) => ({
+        url: `/books/${bookId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Books"],
+    }),
   }),
 });
 
-export const { useGetBooksQuery } = bookApi;
+export const { useGetBooksQuery, useRequestBookMutation } = bookApi;

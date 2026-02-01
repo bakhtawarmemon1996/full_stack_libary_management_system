@@ -35,11 +35,12 @@ export const baseQuery = async (args, api, extraOptions) => {
     switch (status) {
       case 401:
         showSingleToast(
-          result?.error?.data?.message ||
+          result?.data?.message ||
+            result?.error?.data?.message ||
             "Session expired. Please log in again.",
           {
             variant: "error",
-          }
+          },
         );
         Cookies.remove("studentToken");
         Cookies.remove("studentInfo");
@@ -51,14 +52,14 @@ export const baseQuery = async (args, api, extraOptions) => {
       case 400:
         showSingleToast(
           result?.error?.data?.message || "Something went wrong.",
-          { variant: "error" }
+          { variant: "error" },
         );
         break;
 
       case 403:
         showSingleToast(
           result?.error?.data?.message || "You do not have permission.",
-          { variant: "error" }
+          { variant: "error" },
         );
         Cookies.remove("studentToken");
         Cookies.remove("studentInfo");

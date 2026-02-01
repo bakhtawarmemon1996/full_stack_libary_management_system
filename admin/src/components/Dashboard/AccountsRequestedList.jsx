@@ -48,9 +48,9 @@ const AccountsRequestedList = () => {
                     className="w-[48px] h-[48] rounded-full"
                   />
 
-                  <div>
-                    <p className="font-medium">{user?.name}</p>
-                    <p className="text-sm secondary-text">{user?.email}</p>
+                  <div className="w-full">
+                    <p className="font-medium leading-none">{user?.name}</p>
+                    {/* <p className="text-xs secondary-text">{user?.email}</p> */}
                   </div>
                 </div>
               );
