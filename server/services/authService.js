@@ -2,7 +2,8 @@ const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
 const register = async ({
-  name,
+  firstName,
+  lastName,
   email,
   password,
   idNumber,
@@ -15,7 +16,7 @@ const register = async ({
   const existingUser = await User.findOne({ email });
   if (existingUser)
     throw new Error(
-      `An account with '${existingUser.email}' email already exists`
+      `An account with '${existingUser.email}' email already exists`,
     );
 
   if (role === "admin") {
@@ -37,7 +38,8 @@ const register = async ({
   }
 
   const user = await User.create({
-    name,
+    firstName,
+    lastName,
     email,
     password,
     idNumber,
@@ -54,7 +56,8 @@ const register = async ({
 
     data: {
       id: user._id,
-      name: user.name,
+      firstName,
+      lastName,
       email: user.email,
       role: user.role,
       idNumber: user.idNumber,
@@ -78,7 +81,8 @@ const login = async ({ email, password }) => {
     message: "Login successfull",
     data: {
       id: user._id,
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       idNumber: user.idNumber,
       role: user.role,

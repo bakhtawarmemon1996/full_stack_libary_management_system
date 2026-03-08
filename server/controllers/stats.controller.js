@@ -4,16 +4,16 @@ const BorrowedBooks = require("../models/borrowRequests");
 
 exports.getDashboardStats = async (req, res) => {
   try {
-    const books = await Books.find();
-    const users = await Users.find();
-    const requests = await BorrowedBooks.find({ status: "borrowed" });
+    const books = await Books.countDocuments();
+    const users = await Users.countDocuments({ role: "student" });
+    const requests = await BorrowedBooks.countDocuments({ status: "borrowed" });
 
     res.status(200).json({
       message: "Stats fetched successfully.",
       data: {
-        books: books.length,
-        users: users.length,
-        requests: requests.length,
+        books: books,
+        users: users,
+        requests: requests,
       },
     });
   } catch (error) {

@@ -1,11 +1,41 @@
-const UserCard = ({ setShowUSerCard, user }) => {
-  console.log(user);
+import { useEffect, useRef } from "react";
+
+const UserCard = ({ setShowUSerCard, user, setUser }) => {
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") {
+        setShowUSerCard(false);
+        setUser(null);
+      }
+    };
+
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        setShowUSerCard(false);
+        setUser(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleEsc);
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("keydown", handleEsc);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [user]);
+
   return (
     <main
-      onClick={() => setShowUSerCard((prev) => !prev)}
+      // onClick={() => setShowUSerCard((prev) => !prev)}
       className="w-full h-screen fixed inset-0 z-50 bg-[rgba(0,0,0,0.4)] flex items-center justify-center px-5"
     >
-      <div className="w-full max-w-[541px] bg-white rounded-xl py-6 px-6 min-h-[300px]">
+      <div
+        ref={modalRef}
+        className="w-full max-w-[541px] bg-white rounded-xl py-6 px-6 min-h-[300px]"
+      >
         <div className="w-full flex items-center gap-3">
           <div className="">
             <img src={"/logo.png"} className="max-w-[70px]" alt="logo" />
@@ -38,7 +68,7 @@ const UserCard = ({ setShowUSerCard, user }) => {
                 Name:
               </p>
               <p className="secondary-text text-sm leading-none">
-                {user?.name}
+                {user?.firstName} {user?.lastName}
               </p>
             </div>
             <div className="w-full grid grid-cols-2">

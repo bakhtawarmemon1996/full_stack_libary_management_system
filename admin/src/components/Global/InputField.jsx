@@ -5,6 +5,7 @@ const InputField = ({
   onchange,
   placeholder,
   error,
+  isLoading,
 }) => {
   return (
     <div className="w-full">
@@ -18,6 +19,7 @@ const InputField = ({
         value={value}
         onChange={onchange}
         placeholder={placeholder}
+        disabled={isLoading ? isLoading : false}
         className={`bg-white border ${
           error ? "border-red-500" : "border-gray-300"
         } text-gray-900 text-base rounded-lg outline-none block w-full px-5 h-[56px]`}

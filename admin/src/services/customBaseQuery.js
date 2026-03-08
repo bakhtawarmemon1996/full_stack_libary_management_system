@@ -15,6 +15,8 @@ export const customBaseQuery = async (args, api, extraOptions) => {
 
   const result = await rawBaseQuery(args, api, extraOptions);
 
+  console.log(`result >> `, result);
+
   if (result?.error) {
     const status = result.error?.status;
 
@@ -37,7 +39,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
             "Something went wrong.",
           {
             variant: "error",
-          }
+          },
         );
         console.warn("fwefew");
         break;
@@ -49,7 +51,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
             "You do not have permission.",
           {
             variant: "error",
-          }
+          },
         );
         console.warn("Forbidden: You do not have permission.");
         break;
@@ -57,11 +59,11 @@ export const customBaseQuery = async (args, api, extraOptions) => {
       case 404:
         enqueueSnackbar(
           result?.error?.message ||
-            result?.error?.data?.error ||
+            result?.error?.data?.message ||
             "Oops! Resource not found!",
           {
             variant: "error",
-          }
+          },
         );
         console.warn("Resource not found.");
         break;
@@ -69,11 +71,11 @@ export const customBaseQuery = async (args, api, extraOptions) => {
       case 500:
         enqueueSnackbar(
           result?.error?.message ||
-            result?.error?.data?.error ||
+            result?.error?.data?.message ||
             "Something went wrong!",
           {
             variant: "error",
-          }
+          },
         );
         console.error("Server error occurred.");
         break;
@@ -86,7 +88,7 @@ export const customBaseQuery = async (args, api, extraOptions) => {
             "Something went wrong!",
           {
             variant: "error",
-          }
+          },
         );
         console.error("Unhandled API error:", result.error);
         break;

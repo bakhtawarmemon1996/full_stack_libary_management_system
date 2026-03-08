@@ -73,10 +73,15 @@ exports.editBook = async (req, res) => {
     const bookImages = req.files?.bookImages || [];
     const bookCoverImage = req.files?.bookCoverImage?.[0] || null;
 
+    const existingBookImages = req.body.existingBookImages
+      ? JSON.parse(req.body.existingBookImages)
+      : [];
+
     const updatedBook = await bookService.editBook(bookId, {
       ...req.body,
       bookImages,
       bookCoverImage,
+      existingBookImages,
     });
 
     res.status(200).json(updatedBook);
@@ -97,65 +102,6 @@ exports.deleteBook = async (req, res) => {
     res.status(200).json({ message: "Book deleted successfully" });
   } catch (error) {
     console.error("err while deleting book >>>", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
-
-// request to borrow a book
-exports.requestBorrowBook = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const bookId = req.params.bookId;
-    // const { dueDate } = req.body;
-    if (!userId) {
-      throw new Error("User ID is required");
-    }
-    if (!bookId) {
-      throw new Error("Book ID is required");
-    }
-    // if (!dueDate) {
-    //   throw new Error("Due date is required");
-    // }
-
-    const result = await bookService.requestBorrowBook(userId, bookId);
-
-    res.status(201).json({
-      message: "Request submitted successfully",
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    console.error("err while submitting request >>>>", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
-
-// accept or reject borrow request submitted by a student
-exports.acceptRejectRequestBorrowBook = async (req, res) => {
-  try {
-    const requestId = req.params.requestId;
-    const { status } = req.body;
-    if (!requestId) {
-      throw new Error("Request ID is required!");
-    }
-    if (!status) {
-      throw new Error("Status is required!");
-    }
-
-    const allowedStatus = ["Pending", "Borrowed", "Returned", "Rejected"];
-    if (!allowedStatus.includes(status)) {
-      throw new Error("Invalid status value!");
-    }
-    const updatedRequest = await bookService.updateRequestStatus(
-      requestId,
-      status,
-    );
-
-    return res
-      .status(200)
-      .json({ message: "Status updated successfully!", data: updatedRequest });
-  } catch (error) {
-    console.error("Err while changing request status >>>>", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };

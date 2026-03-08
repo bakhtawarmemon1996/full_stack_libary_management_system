@@ -1,10 +1,15 @@
 import * as Yup from "yup";
 
 export const signupValidationSchema = Yup.object({
-  name: Yup.string()
-    .min(3, "Name must contain at least 3 characters")
-    .max(25, "Name must be 25 characters or less")
-    .required("Name is required"),
+  firstName: Yup.string()
+    .min(3, "First name must contain at least 3 characters")
+    .max(15, "Name must be 15 characters or less")
+    .required("First name is required"),
+
+  lastName: Yup.string()
+    .min(3, "Last name must contain at least 3 characters")
+    .max(25, "Last name must be 15 characters or less")
+    .required("Last name is required"),
 
   email: Yup.string()
     .email("Invalid email address")
@@ -30,7 +35,7 @@ export const signupValidationSchema = Yup.object({
     .min(8, "Password must be at least 8 characters long")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])/,
-      "Password must contain at least 1 uppercase, 1 lowercase, and 1 special character"
+      "Password must contain at least 1 uppercase, 1 lowercase, and 1 special character",
     )
     .required("Password is required"),
 });

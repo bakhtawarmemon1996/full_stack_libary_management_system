@@ -9,6 +9,7 @@ import { useSignupMutation } from "../../services/authApi";
 import { signupValidationSchema } from "../../validationSchema/registrationSchema";
 import { FiChevronDown } from "react-icons/fi";
 import { DEPARTMENTS } from "../../constants/departments";
+import { enqueueSnackbar } from "notistack";
 
 const RegistrationForm = () => {
   const [showPass, setShowPass] = useState(false);
@@ -34,7 +35,8 @@ const RegistrationForm = () => {
 
   const formik = useFormik({
     initialValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       idNumber: "",
       password: "",
@@ -46,7 +48,8 @@ const RegistrationForm = () => {
     onSubmit: async (values, { resetForm }) => {
       try {
         const response = await signup({
-          name: values.name,
+          firstName: values.firstName,
+          lastName: values.lastName,
           email: values.email,
           password: values.password,
           idNumber: values.idNumber,
@@ -55,19 +58,14 @@ const RegistrationForm = () => {
           department: values.department,
           role: "student",
         }).unwrap();
-        alert("Account created successfully!");
+        enqueueSnackbar("Account created successfully!", {
+          variant: "success",
+        });
         Cookies.set("studentToken", response?.token);
         Cookies.set("studentInfo", JSON.stringify(response?.data));
         resetForm();
         router("/");
-      } catch (error) {
-        console.log("Err while creating an account >>>>", error);
-        // alert(
-        //     error?.data?.message ||
-        //   error?.response?.data?.message ||
-        //     "Something went wrong!"
-        // );
-      }
+      } catch (error) {}
     },
   });
 
@@ -92,21 +90,40 @@ const RegistrationForm = () => {
 
       {/* Name */}
       <div className="w-full flex flex-col items-start gap-1 mt-3">
-        <label htmlFor="name" className="secondary-text">
-          Full name
+        <label htmlFor="firstName" className="secondary-text">
+          First name
         </label>
         <input
           type="text"
-          name="name"
-          id="name"
-          value={formik.values.name}
+          name="firstName"
+          id="firstName"
+          value={formik.values.firstName}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
-          placeholder="Ethan Smith"
+          placeholder="Ethan"
         />
-        {formik.touched.name && formik.errors.name ? (
-          <p className="text-red-600 text-sm">{formik.errors.name}</p>
+        {formik.touched.firstName && formik.errors.firstName ? (
+          <p className="text-red-600 text-sm">{formik.errors.firstName}</p>
+        ) : null}
+      </div>
+      {/* last name */}
+      <div className="w-full flex flex-col items-start gap-1 mt-3">
+        <label htmlFor="lastName" className="secondary-text">
+          Lasr name
+        </label>
+        <input
+          type="text"
+          name="lastName"
+          id="lastName"
+          value={formik.values.lastName}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
+          placeholder="Smith"
+        />
+        {formik.touched.lastName && formik.errors.lastName ? (
+          <p className="text-red-600 text-sm">{formik.errors.lastName}</p>
         ) : null}
       </div>
       {/* Email */}

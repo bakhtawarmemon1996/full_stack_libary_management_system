@@ -44,10 +44,6 @@ const Layout = ({ page }) => {
     skip: !token,
   });
 
-  // useEffect(() => {
-  //   if (token) refetch();
-  // }, [token]);
-
   useEffect(() => {
     if (isLoading) dispatch(setLoading(true));
     else dispatch(setLoading(false));
@@ -74,13 +70,6 @@ const Layout = ({ page }) => {
         </div>
       </div>
 
-      {/* {isLoading ? (
-        <div className="w-full flex justify-center items-center h-screen">
-          <p className="">
-            <Loader />
-          </p>
-        </div>
-      ) : ( */}
       <div className="w-full lg:w-[calc(100%-15rem)] xl:w-[calc(100%-18rem)] h-full  overflow-y-auto overflow-x-hidden">
         <div className="sticky top-0 left-0 w-full h-24 bg-gray-50 flex items-center justify-between px-4 z-20">
           <button
@@ -110,7 +99,6 @@ const Layout = ({ page }) => {
         </div>
         <div className="w-full p-4 bg-gray-50">{page}</div>
       </div>
-      {/* )} */}
     </div>
   );
 };

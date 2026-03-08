@@ -24,7 +24,7 @@ router.post(
       maxCount: 5,
     },
   ]),
-  addBook
+  addBook,
 );
 
 router.get("/get-books", protect, getBooks);
@@ -39,17 +39,9 @@ router.put(
     { name: "bookCoverImage", maxCount: 1 },
     { name: "bookImages", maxCount: 5 },
   ]),
-  editBook
+  editBook,
 );
 
 router.delete(`/:bookId`, protect, roleMiddleware("admin"), deleteBook);
-
-router.post(`/:bookId`, protect, requestBorrowBook);
-router.put(
-  `/status/:requestId`,
-  protect,
-  roleMiddleware("admin"),
-  acceptRejectRequestBorrowBook
-);
 
 module.exports = router;

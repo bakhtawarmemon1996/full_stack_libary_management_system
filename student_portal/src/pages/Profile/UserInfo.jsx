@@ -27,17 +27,20 @@ const UserInfo = ({ student }) => {
               accountStatus === "pending"
                 ? "text-orange-500"
                 : accountStatus === "rejected"
-                ? "text-red-500"
-                : accountStatus === "accepted"
-                ? "text-green-500"
-                : "text-gray-400"
+                  ? "text-red-500"
+                  : accountStatus === "accepted"
+                    ? "text-green-500"
+                    : "text-gray-400"
             }`}
           >
             {accountStatus === "accepted"
               ? "Verified Student"
-              : accountStatus.charAt(0).toUpperCase() + accountStatus?.slice(1)}
+              : accountStatus?.charAt(0).toUpperCase() +
+                accountStatus?.slice(1)}
           </p>
-          <p className="font-semibold">{student?.name}</p>
+          <p className="font-semibold">
+            {student?.firstName} {student?.lastName}
+          </p>
           <p className="text-gray-400">{student?.email}</p>
         </div>
       </div>

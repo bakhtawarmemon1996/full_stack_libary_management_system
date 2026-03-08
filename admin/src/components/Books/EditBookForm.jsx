@@ -52,16 +52,25 @@ const EditBookForm = () => {
         formData.append("totalBooks", values.bookCount);
         formData.append("bookSummary", values.bookSummary);
 
-        formData.append("bookCoverImage", values.bookCoverImage[0]);
+        // cover image
+        if (values.bookCoverImage[0] instanceof File) {
+          formData.append("bookCoverImage", values.bookCoverImage[0]);
+        }
+
+        const existingImages = [];
 
         values.bookImages.forEach((img) => {
           if (img instanceof File) {
-            formData.append("bookImages", img);
+            formData.append("bookImages", img); // new upload
+          } else {
+            existingImages.push(img); // keep existing
           }
         });
 
+        // send existing images list
+        formData.append("existingBookImages", JSON.stringify(existingImages));
+
         const res = await editBook({ data: formData, bookId }).unwrap();
-        console.log("response >>> ", res);
 
         resetForm();
         enqueueSnackbar("Book updated successfully!", { variant: "success" });
@@ -160,6 +169,7 @@ const EditBookForm = () => {
             value={formik.values.genre}
             onchange={formik.handleChange}
             error={formik.touched.genre && formik.errors.genre}
+            isLoading={isLoading}
           />
 
           <InputField
@@ -168,6 +178,7 @@ const EditBookForm = () => {
             name="bookCount"
             value={formik.values.bookCount}
             onchange={formik.handleChange}
+            isLoading={isLoading}
             error={formik.touched.bookCount && formik.errors.bookCount}
           />
         </div>
@@ -177,7 +188,10 @@ const EditBookForm = () => {
             Cover Image
           </label>
 
-          <label className="flex flex-col items-center justify-center w-full h-[56px] bg-white border rounded-lg cursor-pointer border-gray-300">
+          <label
+            isLoading={isLoading}
+            className="flex flex-col items-center justify-center w-full h-[56px] bg-white border rounded-lg cursor-pointer border-gray-300"
+          >
             <p className="text-sm secondary-text">
               <strong className="font-medium">Click to upload new cover</strong>
             </p>
@@ -186,6 +200,7 @@ const EditBookForm = () => {
               type="file"
               accept="image/*"
               className="hidden"
+              isLoading={isLoading}
               onChange={handleCoverImageChange}
             />
           </label>
@@ -208,7 +223,10 @@ const EditBookForm = () => {
             Book Images (max 5)
           </label>
 
-          <label className="flex flex-col items-center justify-center w-full h-[56px] bg-white border rounded-lg cursor-pointer border-gray-300">
+          <label
+            isLoading={isLoading}
+            className="flex flex-col items-center justify-center w-full h-[56px] bg-white border rounded-lg cursor-pointer border-gray-300"
+          >
             <p className="text-sm secondary-text">
               <strong className="font-medium">Click to upload</strong>
             </p>
@@ -217,6 +235,7 @@ const EditBookForm = () => {
               type="file"
               accept="image/*"
               multiple
+              isLoading={isLoading}
               className="hidden"
               onChange={handleBookImagesChange}
             />
@@ -234,6 +253,7 @@ const EditBookForm = () => {
 
                   <button
                     type="button"
+                    isLoading={isLoading}
                     onClick={() => handleRemoveBookImage(index)}
                     className="w-5 h-5 bg-gray-300 rounded-full absolute -top-2 -right-2 z-10 flex items-center justify-center"
                   >
@@ -252,6 +272,7 @@ const EditBookForm = () => {
           value={formik.values.bookSummary}
           onchange={formik.handleChange}
           error={formik.touched.bookSummary && formik.errors.bookSummary}
+          isLoading={isLoading}
         />
 
         <Button text={`Save`} type={"submit"} loading={isLoading} />

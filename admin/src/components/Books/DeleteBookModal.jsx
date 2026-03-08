@@ -1,6 +1,6 @@
 import { IoClose } from "react-icons/io5";
 
-const RequestRejectModal = ({ isOpen, onclick, onclose, isLoading }) => {
+const DeleteBookModal = ({ isOpen, onclick, onclose, isLoading }) => {
   return (
     isOpen && (
       <div
@@ -15,8 +15,8 @@ const RequestRejectModal = ({ isOpen, onclick, onclose, isLoading }) => {
             <IoClose className="text-2xl" />
           </button>
           <div
-            className={`w-[80px] h-[80px] rounded-full bg-[#4C7B62] flex items-center justify-center`}
-            style={{ border: "10px solid #84ad97" }}
+            className={`w-[80px] h-[80px] rounded-full bg-[#F46F70] flex items-center justify-center`}
+            style={{ border: "10px solid #fc8989" }}
           >
             <img
               src="/info-circle.png"
@@ -26,19 +26,18 @@ const RequestRejectModal = ({ isOpen, onclick, onclose, isLoading }) => {
           </div>
 
           <h2 className="text-[20px] font-semibold leading-none mt-2">
-            Approve Account Request
+            Delete Book
           </h2>
           <p className="secondary-text mb-2">
-            Approve the student’s account request and grant access. A
-            confirmation email will be sent upon approval.
+            Are your sure you want to delete this book?
           </p>
 
           <button
             type="button"
             onClick={() => onclick()}
-            className="bg-[#4C7B62] text-white rounded-xl text-center w-full py-3 font-semibold"
+            className="bg-[#F46F70] text-white rounded-xl text-center w-full py-3 font-semibold outline-none"
           >
-            {isLoading ? "Loading..." : "Approve & Send Confirmation"}
+            {isLoading ? "Deleting..." : "Yes, Delete"}
           </button>
         </div>
       </div>
@@ -46,4 +45,4 @@ const RequestRejectModal = ({ isOpen, onclick, onclose, isLoading }) => {
   );
 };
 
-export default RequestRejectModal;
+export default DeleteBookModal;

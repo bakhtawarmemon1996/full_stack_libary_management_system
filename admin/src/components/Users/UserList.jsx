@@ -24,20 +24,23 @@ const UserList = () => {
     {
       search: searchTerm,
       status: "accepted",
-      limit: 10,
+      limit: 12,
       page: 1,
       page,
     },
     {
-      refetchOnFocus: true,
-    }
+      refetchOnFocus: false,
+    },
   );
   const [showUserCard, setShowUSerCard] = useState(false);
   const [user, setUser] = useState(null);
 
   if (isLoading) return <PageLoader />;
 
-  if (isError) return <ErrorPage />;
+  if (isError) return <ErrorPage refetch={refetch} />;
+
+  const users = data?.data;
+  const pagination = data?.pagination;
 
   const deleteUser = async (userId) => {
     if (!userId) return;
@@ -62,7 +65,7 @@ const UserList = () => {
         <h2 className="section-heading">All Users</h2>
       </div>
 
-      {data && data?.data?.length > 0 ? (
+      {users && users?.length > 0 ? (
         <div className="relative overflow-x-auto my-5 min-h-screen">
           <table className="w-full text-sm text-left rtl:text-righ">
             <thead className="text-sm whitespace-nowrap text-[#3A354E] bg-[#F8F8FF]">
@@ -91,8 +94,8 @@ const UserList = () => {
               </tr>
             </thead>
             <tbody>
-              {data &&
-                data?.data?.map((user, index) => (
+              {users &&
+                users?.map((user, index) => (
                   <tr className="bg-white border-b border-gray-200" key={index}>
                     <th
                       scope="row"
@@ -108,7 +111,7 @@ const UserList = () => {
                         className={`w-[40px] h-[40px] rounded-full object-cover`}
                       />
                       <div className="flex flex-col items-start">
-                        <span>{user?.name}</span>
+                        <span>{user?.firstName + " " + user?.lastName}</span>
                         <span className="secondary-text font-normal">
                           {user?.email}
                         </span>
@@ -140,6 +143,7 @@ const UserList = () => {
                       <button
                         type="button"
                         onClick={() => deleteUser(user?._id)}
+                        className="outline-none"
                       >
                         <GoTrash className="text-base text-red-500" />
                       </button>
@@ -157,10 +161,14 @@ const UserList = () => {
         </div>
       )}
 
-      <Pagination />
+      <Pagination pagination={pagination} />
 
       {showUserCard && (
-        <UserCard setShowUSerCard={setShowUSerCard} user={user} />
+        <UserCard
+          setShowUSerCard={setShowUSerCard}
+          user={user}
+          setUser={setUser}
+        />
       )}
 
       {deletingUser && <RequestLoader />}

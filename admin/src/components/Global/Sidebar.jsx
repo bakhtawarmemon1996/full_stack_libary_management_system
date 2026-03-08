@@ -64,7 +64,7 @@ const Sidebar = () => {
           return (
             <li
               key={index}
-              className={`w-full py-3 rounded-xl px-4 mb-1 ${
+              className={`w-full py-3 rounded-xl px-4 mb-1 hover:bg-[--primary-bg] hover:text-white transition-all duration-200 ${
                 path?.pathname === link?.path
                   ? "primary-bg text-white"
                   : " bg-white text-black"

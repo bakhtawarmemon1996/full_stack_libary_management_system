@@ -14,7 +14,7 @@ const showSingleToast = (message, options = {}) => {
 
   setTimeout(() => {
     isErrorToastActive = false;
-  }, 2000);
+  }, 3000);
 };
 
 const rawBaseQuery = fetchBaseQuery({
@@ -28,15 +28,15 @@ const rawBaseQuery = fetchBaseQuery({
 
 export const baseQuery = async (args, api, extraOptions) => {
   const result = await rawBaseQuery(args, api, extraOptions);
-
+  console.log("result >> ", result);
   if (result?.error) {
     const status = result.error?.status;
 
     switch (status) {
       case 401:
         showSingleToast(
-          result?.data?.message ||
-            result?.error?.data?.message ||
+          result?.error?.data?.message ||
+            result?.data?.message ||
             "Session expired. Please log in again.",
           {
             variant: "error",
@@ -72,11 +72,17 @@ export const baseQuery = async (args, api, extraOptions) => {
         break;
 
       case 500:
-        showSingleToast("Server error occurred.", { variant: "error" });
+        showSingleToast(
+          result?.error?.data?.message || "Server error occurred.",
+          { variant: "error" },
+        );
         break;
 
       default:
-        showSingleToast("Something went wrong!", { variant: "error" });
+        showSingleToast(
+          result?.error?.data?.message || "Something went wrong!",
+          { variant: "error" },
+        );
         break;
     }
   }

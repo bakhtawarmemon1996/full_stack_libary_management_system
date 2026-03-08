@@ -5,6 +5,7 @@ const SummaryField = ({
   onchange,
   placeholder,
   error,
+  isLoading,
 }) => {
   return (
     <div className="w-full">
@@ -19,6 +20,7 @@ const SummaryField = ({
         onChange={onchange}
         placeholder={placeholder}
         rows="7"
+        disabled={isLoading ? isLoading : false}
         className={`bg-white border ${
           error ? "border-red-500" : "border-gray-300"
         } text-gray-900 text-sm rounded-lg block w-full p-3 resize-none`}

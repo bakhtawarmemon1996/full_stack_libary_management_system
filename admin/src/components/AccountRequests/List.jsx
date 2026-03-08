@@ -96,7 +96,7 @@ const List = ({ data, refetch }) => {
                     className={`w-[40px] h-[40px] rounded-full object-cover`}
                   />
                   <div className="flex flex-col items-start">
-                    <span>{user?.name}</span>
+                    <span>{user?.firstName + " " + user?.lastName}</span>
                     <span className="secondary-text font-normal">
                       {user?.email}
                     </span>

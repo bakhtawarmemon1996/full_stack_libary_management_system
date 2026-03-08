@@ -10,27 +10,33 @@ import { formatDate } from "../../utils/formatDate";
 import ErrorPage from "../Global/ErrorPage";
 import { enqueueSnackbar } from "notistack";
 import RequestLoader from "../Global/RequestLoader";
+import { useState } from "react";
+import DeleteBookModal from "./DeleteBookModal";
 
 const BooksList = () => {
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get("search") || "";
   const navigate = useNavigate();
+  const [openDeleteBookModal, setOpenDeleteBookModal] = useState(false);
+  const [bookId, setBookId] = useState(null);
 
   const { data, error, isLoading, refetch } = useGetBooksQuery(
     { search: searchTerm },
     {
       refetchOnFocus: true,
       refetchOnMountOrArgChange: true,
-    }
+    },
   );
   const [deleteBook, { isLoading: isDeleting }] = useDeleteBookMutation();
 
-  const handleDeleteBook = async (bookId) => {
+  const handleDeleteBook = async () => {
     if (!bookId) return;
     try {
       await deleteBook(bookId).unwrap();
       enqueueSnackbar("Book deleted successfully!", { variant: "success" });
       refetch();
+      setOpenDeleteBookModal(false);
+      setBookId(null);
     } catch (error) {}
   };
 
@@ -110,7 +116,10 @@ const BooksList = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleDeleteBook(book?._id)}
+                          onClick={() => {
+                            setOpenDeleteBookModal(true);
+                            setBookId(book?._id);
+                          }}
                         >
                           <GoTrash className="text-base text-red-500 lg:text-lg" />
                         </button>
@@ -143,6 +152,13 @@ const BooksList = () => {
           )}
         </>
       )}
+
+      <DeleteBookModal
+        isOpen={openDeleteBookModal}
+        onclick={handleDeleteBook}
+        isLoading={isDeleting}
+        onclose={() => setOpenDeleteBookModal(false)}
+      />
     </div>
   );
 };

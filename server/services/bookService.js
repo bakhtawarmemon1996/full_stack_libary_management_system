@@ -140,6 +140,7 @@ const editBook = async (bookId, payload) => {
     bookPrimaryColor,
     bookImages = [],
     bookCoverImage,
+    existingBookImages = [],
   } = payload;
 
   // Update text fields
@@ -150,21 +151,21 @@ const editBook = async (bookId, payload) => {
   if (bookSummary) book.bookSummary = bookSummary;
   if (bookPrimaryColor) book.bookPrimaryColor = bookPrimaryColor;
 
-  // Replace COVER image if provided
+  // Update cover image
   if (bookCoverImage) {
     const coverUpload = await cloudinary.uploader.upload(
-      `data:${bookCoverImage.mimetype};base64,${bookCoverImage.buffer.toString(
-        "base64",
-      )}`,
+      `data:${bookCoverImage.mimetype};base64,${bookCoverImage.buffer.toString("base64")}`,
       { folder: "book_cover_images" },
     );
 
     book.bookCoverImage = coverUpload.secure_url;
   }
 
-  // Replace BOOK IMAGES if new ones are uploaded
+  // Upload NEW images
+  let uploadedImages = [];
+
   if (bookImages.length > 0) {
-    const uploadedImages = await Promise.all(
+    uploadedImages = await Promise.all(
       bookImages.map(async (img) => {
         const res = await cloudinary.uploader.upload(
           `data:${img.mimetype};base64,${img.buffer.toString("base64")}`,
@@ -173,9 +174,10 @@ const editBook = async (bookId, payload) => {
         return res.secure_url;
       }),
     );
-
-    book.bookImages = [...book.bookImages, ...uploadedImages];
   }
+
+  // FINAL IMAGE SET
+  book.bookImages = [...existingBookImages, ...uploadedImages];
 
   await book.save();
 
@@ -185,83 +187,9 @@ const editBook = async (bookId, payload) => {
   };
 };
 
-const requestBorrowBook = async (userId, bookId) => {
-  try {
-    const existingRequest = await BorrowRequests.findOne({
-      user: userId,
-      book: bookId,
-      status: { $in: ["pending", "borrowed"] },
-    });
-
-    if (existingRequest) {
-      throw new Error(
-        `You already have a pending or borrowed request for this book.`,
-      );
-    }
-
-    const borrowRequest = await BorrowRequests.create({
-      user: userId,
-      book: bookId,
-      status: "pending",
-      borrowedDate: null,
-      // dueDate: dueDate,
-      returnDate: null,
-    });
-
-    borrowRequest.save();
-
-    return borrowRequest;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
-const updateRequestStatus = async (requestId, status) => {
-  const request = await BorrowRequests.findById(requestId);
-  if (!request) {
-    throw new Error("Request not found!");
-  }
-
-  // const updateFields = { status };
-  const currentDate = new Date();
-
-  switch (status) {
-    case "Borrowed":
-      request.borrowedDate = currentDate;
-      break;
-
-    case "Returned":
-      request.returnDate = currentDate;
-      break;
-
-    case "Rejected":
-      request.borrowedDate = null;
-      request.returnDate = null;
-      break;
-
-    case "Pending":
-      request.borrowedDate = null;
-      request.returnDate = null;
-      break;
-
-    default:
-      throw new Error("Invalid status update");
-  }
-
-  const updatedRequest = await BorrowRequests.findByIdAndUpdate(
-    requestId,
-    { status },
-    { new: true },
-  );
-
-  return updatedRequest;
-};
-
 module.exports = {
   createBook,
   getBooks,
   getBook,
   editBook,
-  requestBorrowBook,
-  updateRequestStatus,
 };
