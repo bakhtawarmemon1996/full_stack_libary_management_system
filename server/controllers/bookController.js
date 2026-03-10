@@ -5,7 +5,7 @@ const BorrowRequests = require("../models/borrowRequests");
 exports.addBook = async (req, res) => {
   try {
     const bookImages = req.files?.bookImages || [];
-    const bookCoverImage = req.files?.bookCoverImage?.[0]; // ✅ FIX
+    const bookCoverImage = req.files?.bookCoverImage?.[0];
 
     if (!bookCoverImage) {
       throw new Error("Book cover image is required");
@@ -35,8 +35,13 @@ exports.addBook = async (req, res) => {
 // get all books
 exports.getBooks = async (req, res) => {
   try {
-    const { search, department } = req.query;
-    const books = await bookService.getBooks({ search, department });
+    const { search, department, limit, page } = req.query;
+    const books = await bookService.getBooks({
+      search,
+      department,
+      limit,
+      page,
+    });
     res.status(200).json({ data: books });
   } catch (error) {
     console.error(error);

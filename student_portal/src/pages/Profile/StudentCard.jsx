@@ -1,5 +1,4 @@
 const StudentCard = ({ student }) => {
-  console.log(student);
   return (
     <div
       className="w-full max-w-[477px] min-h-[245px] relative overflow-hidden p-6 rounded-md"
@@ -35,19 +34,22 @@ const StudentCard = ({ student }) => {
 
         <div className="w-full space-y-1.5">
           <p className="text-xs">
-            <span>Student ID</span>:<span>{student?.idNumber}</span>
+            <span>Student ID</span>: <span>{student?.idNumber}</span>
           </p>
           <p className="text-xs">
-            <span>Full Name</span>:<span>{student?.name}</span>
+            <span>Full Name</span>:{" "}
+            <span>
+              {student?.firstName} {student?.lastName}
+            </span>
           </p>
           <p className="text-xs">
-            <span>Department</span>:<span>{student?.department}</span>
+            <span>Department</span>: <span>{student?.department}</span>
           </p>
           <p className="text-xs">
-            <span>Date of Birth</span>:<span>{student?.dateOfBirth}</span>
+            <span>Date of Birth</span>: <span>{student?.dateOfBirth}</span>
           </p>
           <p className="text-xs">
-            <span>Contact no</span>:<span>{student?.phoneNumber}</span>
+            <span>Contact no</span>: <span>{student?.phoneNumber}</span>
           </p>
         </div>
       </div>

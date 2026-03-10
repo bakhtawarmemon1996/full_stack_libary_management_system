@@ -78,19 +78,128 @@ const updateRequestStatus = async (requestId, status) => {
   return updatedRequest;
 };
 
-const getBorrowRequests = async ({ search, page, limit, status }) => {
-  const query = {};
+const getBorrowRequests = async ({ search, page = 1, limit = 10, status }) => {
+  const matchStage = {};
+  if (status) matchStage.status = status;
+
+  // ensure numbers
+  const pageNumber = parseInt(page, 10) || 1;
+  const limitNumber = parseInt(limit, 10) || 10;
+  const skip = (pageNumber - 1) * limitNumber;
+
+  const searchRegex = search ? new RegExp(search, "i") : null;
+
+  const pipeline = [
+    { $match: matchStage },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    { $unwind: "$user" },
+    {
+      $lookup: {
+        from: "books",
+        localField: "book",
+        foreignField: "_id",
+        as: "book",
+      },
+    },
+    { $unwind: "$book" },
+    ...(searchRegex
+      ? [
+          {
+            $match: {
+              $or: [
+                { "user.name": { $regex: searchRegex } },
+                { "user.email": { $regex: searchRegex } },
+                { "book.title": { $regex: searchRegex } },
+                { "book.author": { $regex: searchRegex } },
+              ],
+            },
+          },
+        ]
+      : []),
+    { $sort: { createdAt: -1 } },
+    { $skip: skip },
+    { $limit: limitNumber }, // <-- must be a number
+  ];
+
+  const requests = await BorrowRequests.aggregate(pipeline);
+
+  // Count total for pagination
+  const countPipeline = [
+    { $match: matchStage },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    { $unwind: "$user" },
+    {
+      $lookup: {
+        from: "books",
+        localField: "book",
+        foreignField: "_id",
+        as: "book",
+      },
+    },
+    { $unwind: "$book" },
+    ...(searchRegex
+      ? [
+          {
+            $match: {
+              $or: [
+                { "user.name": { $regex: searchRegex } },
+                { "user.email": { $regex: searchRegex } },
+                { "book.title": { $regex: searchRegex } },
+                { "book.author": { $regex: searchRegex } },
+              ],
+            },
+          },
+        ]
+      : []),
+    { $count: "total" },
+  ];
+
+  const totalCountResult = await BorrowRequests.aggregate(countPipeline);
+  const total = totalCountResult[0]?.total || 0;
+
+  return {
+    data: requests,
+    pagination: {
+      page: pageNumber,
+      limit: limitNumber,
+      total,
+      totalPages: Math.ceil(total / limitNumber),
+    },
+  };
+};
+
+const getUserBorrowedBooks = async ({ user, status }) => {
+  const query = { user: user._id };
 
   if (status) {
     query.status = status;
   }
 
-  if (search) {
-    query.$or = [{}];
-  }
+  const data = await BorrowRequests.find(query)
+    .populate("book")
+    .sort({ createdAt: -1 })
+    .select("-user -__v");
+
+  return data;
 };
 
 module.exports = {
   requestBorrowBook,
   updateRequestStatus,
+  getBorrowRequests,
+  getUserBorrowedBooks,
 };

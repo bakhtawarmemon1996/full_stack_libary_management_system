@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { IoClose, IoSearch } from "react-icons/io5";
 import { useSearchParams } from "react-router-dom";
+import { IoSearchOutline } from "react-icons/io5";
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,18 +22,22 @@ const Search = () => {
   }, [value]);
 
   return (
-    <div className="w-full max-w-[280px] h-[44px] bg-[#F8F8FF] rounded-xl flex items-center px-4 gap-2">
-      <IoSearch className="text-xl text-gray-400" />
+    <div className="flex gap-2 items-center justify-end h-12 rounded-xl border bg-white w-[35%] px-3.5">
+      <IoSearchOutline className="text-xl secondary-text" />
       <input
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Search..."
-        className="w-full h-full outline-none bg-transparent text-sm text-gray-500"
+        placeholder="Search users, books by title, author, or genre."
+        className="w-full h-full outline-none text-sm secondary-text"
       />
       {value && (
-        <button type="button" onClick={() => setValue("")}>
-          <IoClose />
+        <button
+          type="button"
+          onClick={() => setValue("")}
+          className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center"
+        >
+          <IoClose size={16} className="secondary-text" />
         </button>
       )}
     </div>

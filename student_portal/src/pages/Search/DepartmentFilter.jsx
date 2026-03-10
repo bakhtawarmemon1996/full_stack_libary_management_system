@@ -32,6 +32,7 @@ const DepartmentFilter = () => {
         className="outline-none bg-[#232839] text-white w-full"
       >
         <option value="">Genre</option>
+        <option value="">All</option>
         <option value="fiction">Fiction</option>
         <option value="history">History</option>
         <option value="science">Science</option>

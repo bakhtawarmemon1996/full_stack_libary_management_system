@@ -4,6 +4,7 @@ import { useGetUsersQuery } from "../../services/users/authApi";
 import PageLoader from "../Global/PageLoader";
 import ErrorPage from "../Global/ErrorPage";
 import { useState } from "react";
+import Pagination from "../Global/Pagination";
 
 const AccountRequestList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,8 +19,10 @@ const AccountRequestList = () => {
     {
       refetchOnFocus: true,
       refetchOnMountOrArgChange: true,
-    }
+    },
   );
+
+  const pagination = data?.pagination;
 
   const updateStatusInUrl = (status) => {
     const params = new URLSearchParams(searchParams);
@@ -66,6 +69,8 @@ const AccountRequestList = () => {
           </div>
         </div>
       )}
+
+      <Pagination pagination={pagination} />
     </div>
   );
 };

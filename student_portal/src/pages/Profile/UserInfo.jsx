@@ -1,7 +1,7 @@
 import StudentCard from "./StudentCard";
 import { LiaUserEditSolid } from "react-icons/lia";
 
-const UserInfo = ({ student }) => {
+const UserInfo = ({ student, handleToggleEditProfileModal }) => {
   const accountStatus = student?.status;
   return (
     <div className="w-full max-w-[566px] bg-[#232839] rounded-[10px] p-8 flex flex-col items-start gap-5 sticky top-10">
@@ -16,6 +16,7 @@ const UserInfo = ({ student }) => {
           />
           <button
             type="button"
+            onClick={handleToggleEditProfileModal}
             className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center absolute bottom-2 right-2"
           >
             <LiaUserEditSolid color="#000" />

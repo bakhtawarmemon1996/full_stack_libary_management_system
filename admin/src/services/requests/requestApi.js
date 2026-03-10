@@ -9,26 +9,25 @@ export const requestApi = createApi({
 
   refetchOnFocus: true,
   refetchOnReconnect: true,
+  refetchOnMountOrArgChange: true,
 
   endpoints: (builder) => ({
     getRequests: builder.query({
-      //   query: ({ search, page, limit, skip, status }) => {
-      query: () => {
-        // const params = new URLSearchParams();
+      query: ({ search, page, limit, skip, status }) => {
+        const params = new URLSearchParams();
 
-        // if (search) params.append(`search`, search);
-        // if (status) params.append("status", status);
-        // if (limit) params.append("limit", limit);
-        // if (page) params.append("page", page);
-        // if (skip) params.append("skip", skip);
+        if (search) params.append(`search`, search);
+        if (status) params.append("status", status);
+        if (limit) params.append("limit", limit);
+        if (page) params.append("page", page);
+        if (skip) params.append("skip", skip);
 
         return {
-          //   url: `/requests?${params.toString()}`,
-          url: `/requests`,
+          url: `/requests?${params.toString()}`,
         };
       },
 
-      keepUnusedDataFor: 300,
+      keepUnusedDataFor: 0,
 
       providesTags: (result) => {
         if (!result) return [{ type: "Requests", id: "LIST" }];

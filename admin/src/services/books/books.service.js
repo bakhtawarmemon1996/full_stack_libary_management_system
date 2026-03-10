@@ -6,11 +6,13 @@ export const booksAPi = createApi({
   baseQuery: customBaseQuery,
   endpoints: (builder) => ({
     getBooks: builder.query({
-      query: ({ search }) => {
+      query: ({ search, limit, page }) => {
         const params = new URLSearchParams();
         if (search) params.append("search", search);
+        if (limit) params.append("limit", limit);
+        if (page) params.append("page", page);
         return {
-          url: `/books/get-books?${params.toString()}`,
+          url: `/books?${params.toString()}`,
         };
       },
     }),
@@ -19,7 +21,7 @@ export const booksAPi = createApi({
     }),
     addBook: builder.mutation({
       query: (data) => ({
-        url: `/books/add-book`,
+        url: `/books`,
         method: "POST",
         body: data,
       }),

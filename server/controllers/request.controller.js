@@ -64,12 +64,32 @@ exports.acceptRejectRequestBorrowBook = async (req, res) => {
 // get all requests - admin only
 exports.getRequests = async (req, res) => {
   try {
-    // const { search, page, limit, status } = req.body;
-    const requests = await BorrowRequests.find()
-      .populate("book")
-      .populate("user")
-      .sort({ createdAt: -1 });
-    res.status(200).json({ data: requests });
+    const { search, page, limit, status } = req.query;
+    const requests = await requestService.getBorrowRequests({
+      search,
+      page,
+      limit,
+      status,
+    });
+
+    res.json(requests);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+exports.getUserBorrowedBooks = async (req, res) => {
+  try {
+    const user = req.user;
+    const { status } = req.query;
+
+    const books = await requestService.getUserBorrowedBooks({
+      user,
+      status,
+    });
+
+    res.json(books);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

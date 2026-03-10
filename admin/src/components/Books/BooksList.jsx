@@ -12,21 +12,24 @@ import { enqueueSnackbar } from "notistack";
 import RequestLoader from "../Global/RequestLoader";
 import { useState } from "react";
 import DeleteBookModal from "./DeleteBookModal";
+import Pagination from "../../components/Global/Pagination";
 
 const BooksList = () => {
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get("search") || "";
+  const page = Number(searchParams.get("page")) || 1;
   const navigate = useNavigate();
   const [openDeleteBookModal, setOpenDeleteBookModal] = useState(false);
   const [bookId, setBookId] = useState(null);
 
   const { data, error, isLoading, refetch } = useGetBooksQuery(
-    { search: searchTerm },
+    { search: searchTerm, limit: 10, page },
     {
       refetchOnFocus: true,
       refetchOnMountOrArgChange: true,
     },
   );
+  const pagination = data?.data?.pagination;
   const [deleteBook, { isLoading: isDeleting }] = useDeleteBookMutation();
 
   const handleDeleteBook = async () => {
@@ -63,7 +66,7 @@ const BooksList = () => {
       ) : (
         <>
           {data?.data?.books?.length > 0 ? (
-            <div className="relative overflow-x-auto my-5">
+            <div className="relative overflow-x-auto my-5 min-h-screen">
               <table className="w-full text-sm text-left rtl:text-righ">
                 <thead className="text-sm text-[#3A354E] bg-[#F8F8FF]">
                   <tr>
@@ -152,6 +155,8 @@ const BooksList = () => {
           )}
         </>
       )}
+
+      <Pagination pagination={pagination} />
 
       <DeleteBookModal
         isOpen={openDeleteBookModal}

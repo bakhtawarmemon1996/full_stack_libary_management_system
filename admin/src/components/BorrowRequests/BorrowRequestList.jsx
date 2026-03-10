@@ -1,12 +1,28 @@
+import { useSearchParams } from "react-router-dom";
 import { useGetRequestsQuery } from "../../services/requests/requestApi";
 import ErrorPage from "../Global/ErrorPage";
 import PageLoader from "../Global/PageLoader";
 import RequestTable from "./RequestTable";
+import Pagination from "../../components/Global/Pagination";
 
 const BorrowRequestList = () => {
-  const { data, isLoading, isError, refetch } = useGetRequestsQuery(undefined);
+  const [searchParams] = useSearchParams();
+  const search = searchParams.get("search") || "";
+  const status = searchParams.get("status") || "";
+  const page = Number(searchParams.get("page")) || 1;
+  // search, page, limit, skip, status
+  const { data, isLoading, isError, refetch } = useGetRequestsQuery({
+    search: search,
+    page: page,
+    limit: 20,
+    skip: 0,
+    status,
+  });
 
   const requests = data?.data;
+  const pagination = data?.pagination;
+
+  const isFiltered = search || status;
 
   if (isLoading) return <PageLoader />;
 
@@ -29,8 +45,8 @@ const BorrowRequestList = () => {
           )}
         </div>
       </div>
-      {requests?.length > 0 ? (
-        <RequestTable requests={requests} />
+      {requests?.length > 0 || isFiltered ? (
+        <RequestTable requests={requests || []} />
       ) : (
         <div className="w-full bg-white rounded-xl p-6">
           <div className="w-full flex items-center justify-center text-center min-h-screen px-4">
@@ -40,6 +56,8 @@ const BorrowRequestList = () => {
           </div>
         </div>
       )}
+
+      <Pagination pagination={pagination} />
     </div>
   );
 };

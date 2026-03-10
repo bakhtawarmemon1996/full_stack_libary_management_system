@@ -1,35 +1,39 @@
 import { useEffect, useRef, useState } from "react";
-import { useUpdateRequestStatusMutation } from "../../services/requests/requestApi";
-import { enqueueSnackbar } from "notistack";
-import { getStatusStyle } from "../../utils/getStatusSatyle";
+import { IoMdArrowDropdown } from "react-icons/io";
+import { useSearchParams } from "react-router-dom";
 
 const REQUESTS_STATUS = [
+  { title: "All", value: "" },
   { title: "Pending", value: "pending" },
   { title: "Borrowed", value: "borrowed" },
   { title: "Returned", value: "returned" },
   { title: "Late Return", value: "late-return" },
 ];
 
-const StatusDropdown = ({ defaultValue, requestId }) => {
-  const [selectedStatus, setSelectedStatus] = useState(defaultValue);
+const StatusFilter = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedStatusValue = searchParams.get("status") || "";
+  const [selectedStatus, setSelectedStatus] = useState(selectedStatusValue);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-  const [updateStatus, { isLoading }] = useUpdateRequestStatusMutation();
 
   const handleSelect = async (status) => {
     setSelectedStatus(status);
     setOpen(false);
-
-    try {
-      await updateStatus({ requestId, status }).unwrap();
-      enqueueSnackbar("Request status updated", { variant: "success" });
-
-      console.log("Status updated");
-    } catch (error) {}
   };
 
-  const currentStatus = REQUESTS_STATUS.find((s) => s.value === selectedStatus);
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      if (selectedStatus?.trim() === "") {
+        searchParams.delete("status");
+        setSearchParams(searchParams);
+      } else {
+        setSearchParams({ status: selectedStatus });
+      }
+    }, 300);
+
+    return () => clearTimeout(delay);
+  }, [selectedStatus]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -49,11 +53,10 @@ const StatusDropdown = ({ defaultValue, requestId }) => {
     <div className="relative inline-block text-left">
       <button
         onClick={() => setOpen(!open)}
-        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(
-          defaultValue,
-        )}`}
+        className={`px-3 py-1 rounded-full text-xs text-[#3A354E] flex items-center gap-2`}
       >
-        {defaultValue.charAt(0).toUpperCase() + defaultValue.slice(1)}
+        <span>Status</span>
+        <IoMdArrowDropdown size={18} />
       </button>
 
       {open && (
@@ -61,15 +64,13 @@ const StatusDropdown = ({ defaultValue, requestId }) => {
           ref={dropdownRef}
           className="absolute mt-2 w-32 bg-white border rounded-lg shadow-lg z-50 py-3"
         >
-          {REQUESTS_STATUS.map((status) => (
+          {REQUESTS_STATUS?.map((status) => (
             <div
               key={status.value}
               onClick={() => handleSelect(status.value)}
               className={`cursor-pointer px-3 py-2 text-xs bg-white`}
             >
-              <span
-                className={`${getStatusStyle(status?.value)} px-2 py-1 rounded-full font-medium`}
-              >
+              <span className={`px-2 py-1 rounded-full font-medium`}>
                 {status.title}
               </span>
             </div>
@@ -80,4 +81,4 @@ const StatusDropdown = ({ defaultValue, requestId }) => {
   );
 };
 
-export default StatusDropdown;
+export default StatusFilter;

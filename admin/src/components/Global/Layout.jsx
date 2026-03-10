@@ -8,6 +8,7 @@ import { data, useSearchParams } from "react-router-dom";
 import Loader from "./Loader";
 import { setError, setLoading, setUser } from "../../features/slices/userSlice";
 import { useDispatch } from "react-redux";
+import Search from "./Search";
 
 const Layout = ({ page }) => {
   const sidebarRef = useRef(null);
@@ -86,7 +87,7 @@ const Layout = ({ page }) => {
               Monitor all of your projects and tasks here
             </p>
           </div>
-          <div className="flex gap-2 items-center justify-end h-12 rounded-xl border bg-white w-[35%] px-3.5">
+          {/* <div className="flex gap-2 items-center justify-end h-12 rounded-xl border bg-white w-[35%] px-3.5">
             <IoSearchOutline className="text-xl secondary-text" />
             <input
               type="text"
@@ -95,7 +96,8 @@ const Layout = ({ page }) => {
               placeholder="Search users, books by title, author, or genre."
               className="w-full h-full outline-none text-sm secondary-text"
             />
-          </div>
+          </div> */}
+          <Search />
         </div>
         <div className="w-full p-4 bg-gray-50">{page}</div>
       </div>

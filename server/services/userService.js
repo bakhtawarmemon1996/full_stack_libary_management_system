@@ -60,7 +60,7 @@ const updateUserRole = async (userId, role) => {
   const user = await User.findByIdAndUpdate(
     userId,
     { role: role },
-    { new: true }
+    { new: true },
   ).select("-password");
   return user;
 };
@@ -69,7 +69,7 @@ const approveUserProfile = async (userId, status) => {
   const user = await User.findByIdAndUpdate(
     userId,
     { status },
-    { new: true }
+    { new: true },
   ).select("-password");
   return user;
 };

@@ -28,7 +28,6 @@ const rawBaseQuery = fetchBaseQuery({
 
 export const baseQuery = async (args, api, extraOptions) => {
   const result = await rawBaseQuery(args, api, extraOptions);
-  console.log("result >> ", result);
   if (result?.error) {
     const status = result.error?.status;
 
@@ -58,29 +57,40 @@ export const baseQuery = async (args, api, extraOptions) => {
 
       case 403:
         showSingleToast(
-          result?.error?.data?.message || "You do not have permission.",
+          result?.error?.data?.message ||
+            result?.data?.message ||
+            "You do not have permission.",
           { variant: "error" },
         );
-        Cookies.remove("studentToken");
-        Cookies.remove("studentInfo");
+        // Cookies.remove("studentToken");
+        // Cookies.remove("studentInfo");
         break;
 
       case 404:
-        showSingleToast(result?.error?.data?.message || "Resource not found.", {
-          variant: "error",
-        });
+        showSingleToast(
+          result?.error?.data?.message ||
+            result?.data?.message ||
+            "Resource not found.",
+          {
+            variant: "error",
+          },
+        );
         break;
 
       case 500:
         showSingleToast(
-          result?.error?.data?.message || "Server error occurred.",
+          result?.error?.data?.message ||
+            result?.data?.message ||
+            "Server error occurred.",
           { variant: "error" },
         );
         break;
 
       default:
         showSingleToast(
-          result?.error?.data?.message || "Something went wrong!",
+          result?.error?.data?.message ||
+            result?.data?.message ||
+            "Something went wrong!",
           { variant: "error" },
         );
         break;

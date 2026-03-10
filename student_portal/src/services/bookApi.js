@@ -9,7 +9,7 @@ export const bookApi = createApi({
     // get all books query (pagination + limit + search)
     getBooks: builder.query({
       query: ({ page, limit, search, department }) => ({
-        url: `/books/get-books`,
+        url: `/books`,
         params: {
           page,
           limit,
@@ -28,7 +28,20 @@ export const bookApi = createApi({
       }),
       invalidatesTags: ["Books"],
     }),
+
+    // get borrowed books
+    getBorrowedBooks: builder.query({
+      query: () => ({
+        url: `/requests/borrowed`,
+        method: "GET",
+      }),
+      invalidatesTags: ["Books"],
+    }),
   }),
 });
 
-export const { useGetBooksQuery, useRequestBookMutation } = bookApi;
+export const {
+  useGetBooksQuery,
+  useRequestBookMutation,
+  useGetBorrowedBooksQuery,
+} = bookApi;

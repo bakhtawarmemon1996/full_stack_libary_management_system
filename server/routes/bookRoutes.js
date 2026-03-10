@@ -14,7 +14,7 @@ const roleMiddleware = require("../middlewares/roleMiddleware");
 const upload = require("../middlewares/upload");
 
 router.post(
-  "/add-book",
+  "/",
   protect,
   roleMiddleware("admin"),
   upload.fields([
@@ -27,7 +27,7 @@ router.post(
   addBook,
 );
 
-router.get("/get-books", protect, getBooks);
+router.get("/", protect, getBooks);
 router.get("/:bookId", protect, getBook);
 // router.get("/:bookTitle");
 

@@ -24,7 +24,7 @@ const HomePage = () => {
 
   if (isLoading) return <PageLoader />;
 
-  if (books.length <= 0) {
+  if (!books?.length) {
     return (
       <main className="w-full min-h-screen flex flex-col items-center justify-center gap-4 px-4">
         <img
