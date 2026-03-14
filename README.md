@@ -190,14 +190,14 @@ JWT_SECRET=your_secret_key
 
 ```bash
 cd server
-npm run dev
+npm start
 ```
 
 ### Start frontend
 
 ```bash
 cd client
-npm start
+npm run dev
 ```
 
 ---
@@ -229,11 +229,8 @@ npm start
 
 - Email notifications for approvals
 - Book return reminders
-- Book availability tracking
-- Pagination & advanced search
 - Fine calculation for late returns
 - Admin analytics dashboard
-- Dark mode UI
 
 ---
 
@@ -264,24 +261,9 @@ git push origin feature-name
 
 ---
 
-# 📜 License
-
-This project is licensed under the **MIT License**.
-
----
-
 # 👨‍💻 Author
 
-Developed by **Your Name**
+Developed by **Bakhtawar**
 
 GitHub:
-[https://github.com/yourusername](https://github.com/yourusername)
-
----
-
-✅ If you'd like, I can also help you create:
-
-- **🔥 A much more impressive GitHub README (with badges, screenshots, animations)**
-- **System Architecture Diagram**
-- **Database Schema Diagram**
-- **Portfolio-level README to impress recruiters** (highly recommended).
+https://github.com/bakhtawarmemon1996
