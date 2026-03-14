@@ -9,7 +9,7 @@ const AccountsRequestedList = () => {
     },
     {
       refetchOnFocus: true,
-    }
+    },
   );
 
   if (isError) {
@@ -49,8 +49,9 @@ const AccountsRequestedList = () => {
                   />
 
                   <div className="w-full">
-                    <p className="font-medium leading-none">{user?.name}</p>
-                    {/* <p className="text-xs secondary-text">{user?.email}</p> */}
+                    <p className="font-medium leading-none">
+                      {user?.firstName + " " + user?.lastName}
+                    </p>
                   </div>
                 </div>
               );

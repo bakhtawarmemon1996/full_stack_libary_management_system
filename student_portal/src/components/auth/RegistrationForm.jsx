@@ -276,7 +276,7 @@ const RegistrationForm = () => {
 
       <p className="secondary-text font-medium text-center mt-2 mx-auto">
         Already have an account?{" "}
-        <Link href={"/login"} className="orangeText">
+        <Link to={"/login"} className="orangeText">
           Login
         </Link>
       </p>
