@@ -1,7 +1,3 @@
-Below is a **professional, clean, ready-to-use `README.md`** for your MERN **Library Management System**. You can **copy-paste it directly into your GitHub README.md**.
-
----
-
 # 📚 Library Management System (MERN Stack)
 
 A **full-stack Library Management System** built using the **MERN Stack (MongoDB, Express.js, React.js, Node.js)**.
