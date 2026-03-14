@@ -259,7 +259,7 @@ git push origin feature-name
 
 # 👨‍💻 Author
 
-Developed by **Shoaib Muhammad**
+Developed by **Bakhtawar**
 
 GitHub:
-https://github.com/ShoaibMuhammad786
+https://github.com/bakhtawarmemon1996
